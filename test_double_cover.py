@@ -105,7 +105,9 @@ def test_net_splice_85_percent_limit_and_no_shim_strength_credit():
     ('bolt','ASTM A307','A325 ou A490'),('V',float('nan'),'finitas')])
 def test_geometry_and_unsupported_modes_stop_resistance(field,value,phrase):
     r=evaluate(replace(BASE,**{field:value}))
-    assert r.status=='GEOMETRIA INVÁLIDA' and not r.checks
+    if field in ('extension','root_height','corner_clip'):
+        assert r.checks and any(x.severity=='interference' for x in r.issues)
+    else:assert r.status=='GEOMETRIA INVÁLIDA' and not r.checks
     assert any(phrase in x.text for x in r.issues)
 
 def test_zero_and_overload_do_not_receive_approval():

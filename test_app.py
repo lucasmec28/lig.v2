@@ -63,18 +63,21 @@ def test_plate_position_visible_manual_and_invalid():
     assert any('GEOMETRIA INVÁLIDA' in x.value for x in at.error)
 
 
-def test_removed_full_depth_import_cannot_be_reinterpreted():
+def test_legacy_complement_import_and_export():
     import json
     from dataclasses import replace
     from lro.examples import presets
     legacy=replace(next(iter(presets().values())),plate_shape='between_flanges')
     at=AppTest.from_file(str(APP),default_timeout=30).run()
-    assert not any(x.key in ('plate_shape','restrained','opposite_stiffener','support_joint_weld') for x in [*at.selectbox,*at.checkbox,*at.number_input])
+    assert at.selectbox(key='plate_shape')
+    assert not any(x.key in ('restrained','opposite_stiffener','support_joint_weld') for x in [*at.selectbox,*at.checkbox,*at.number_input])
     at.get('file_uploader')[0].upload('antigo.json',json.dumps(legacy.to_dict()).encode(),'application/json').run()
     next(x for x in at.button if x.label=='Abrir arquivo').click().run()
     assert not at.exception
-    assert any('variante retirada' in x.value for x in at.error)
-    assert at.session_state['plate_shape']=='rectangular'
+    assert not at.error
+    assert at.session_state['plate_shape']=='between_flanges'
+    next(x for x in at.button if x.label=='Gerar memória Word').click().run()
+    assert not at.exception and at.session_state['report'][2][:2]==b'PK'
 
 
 def test_usi_options_follow_product_type():

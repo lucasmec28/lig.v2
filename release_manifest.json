@@ -1,21 +1,12 @@
 {
-  "versao": "0.7.0",
+  "versao": "0.7.1",
   "data": "2026-10-09",
-  "testes_software": 175,
-  "testes_anteriores": 147,
-  "testes_end_plates": 28,
-  "revisao_visual": "Sete memórias Word renderizadas; todas as 36 páginas inspecionadas. Exemplos das famílias anteriores regenerados com a apresentação e premissas da versão 0.7.",
-  "paginas_memorias": {
-    "end_plate_rotulada": 5,
-    "end_plate_engastada_duas_extensoes": 5,
-    "end_plate_engastada_acima": 5,
-    "duas_talas_tracao": 6,
-    "duas_talas_compressao": 6,
-    "single_plate_viga_viga": 4,
-    "single_plate_viga_coluna": 5
-  },
-  "escopo": "Modelos locais em duas dimensões. End plate engastada 4E no domínio do DG39; rigidez adotada pelo procedimento usual de detalhamento e NBR 6.1.2.3, sem curva momento-rotação calculada. Premissas e limites específicos registrados no aplicativo, nas memórias e na metodologia.",
-  "validacao": "Testes de software, regressão, conferências de equações e comparação de componente com o exemplo 5.3-1 do DG39; não constitui validação experimental do conjunto.",
+  "testes_software": 185,
+  "resultado_testes": "185 passed in 48.16s",
+  "novos_casos_regressao": 10,
+  "revisao_visual": "Duas novas memórias Word de cinco páginas cada: todas as dez páginas renderizadas e inspecionadas. Sete exemplos 0.7.0 preservados sem alteração.",
+  "escopo": "Interferências de montagem permitem cálculo nominal e exportação. Complemento até as mesas exclusivo da single plate viga–viga, sem verificações extras nem crédito resistente; estabilidade e redistribuição pelo complemento não avaliadas.",
+  "regressao_projeto_usuario": "24 verificações. Resultado NÃO ATENDE, governante resistente bearing_beam. Resultados idênticos com e sem complemento.",
   "arquivos": [
     {
       "arquivo": ".streamlit/config.toml",
@@ -24,18 +15,23 @@
     },
     {
       "arquivo": "README.md",
-      "bytes": 6275,
-      "sha256": "4be5b5251d1f3e4e6adb3171381c7dccf4b2ade622e99156e72cd289069621b8"
+      "bytes": 7800,
+      "sha256": "0a1393866debe6f6ef53bbb863ed37a1f0d790f010bd4f1dde6efb7a54172b2e"
     },
     {
       "arquivo": "app.py",
-      "bytes": 21772,
-      "sha256": "02bfc33114a4de0875d5aabbb984be1fd8f7fd7e08dcfba8f8a574adfa4c7373"
+      "bytes": 23352,
+      "sha256": "318ce9649869b4004aa1c876dae20cca43b2208928242b549f4ae7809d8d3430"
     },
     {
       "arquivo": "data/profiles.json",
       "bytes": 165033,
       "sha256": "42ad4ec10bb1b16773e0580ca2dbcbb79c9f8fc6927e24d95a29fbd323df2602"
+    },
+    {
+      "arquivo": "docs/AJUSTES_V071.md",
+      "bytes": 3276,
+      "sha256": "fc4bc1355529143de2dd058b6a14ffa1e7ae671060583bfbab049059691cc059"
     },
     {
       "arquivo": "docs/AUDITORIA_PLANILHA.md",
@@ -54,23 +50,23 @@
     },
     {
       "arquivo": "docs/METODOLOGIA.md",
-      "bytes": 12712,
-      "sha256": "8e37a26bda6cf50b4cbfed3d99ebe67ec63c30382a2e7f233a5531916db6467d"
+      "bytes": 13017,
+      "sha256": "250fc0ec2bb02fea85a1baba96edce271f07feb376a540e62c9b13ecb2ce63e0"
     },
     {
       "arquivo": "docs/REVISAO_TECNICA.md",
-      "bytes": 5616,
-      "sha256": "c887c23e875ed1dad26fa17eb7c4aba4495aa7668679681ac5f20d09f0b48e0e"
+      "bytes": 5921,
+      "sha256": "27b53a4841afc569f52fbce1a18b7dcdeec26d23884b0170a0404ea8bf95d7d1"
     },
     {
       "arquivo": "docs/VALIDACAO.md",
-      "bytes": 931,
-      "sha256": "a1e3c4c88fd9588347827ce43af41e395832fe50874d19cd3fa70dcc6a05e82d"
+      "bytes": 1236,
+      "sha256": "145034868e8c51911357c56514b9aee6855caf70a244ff935fa90a67eb6cb620"
     },
     {
       "arquivo": "docs/VALIDACAO_INDEPENDENTE.md",
-      "bytes": 890,
-      "sha256": "e36b6509fbdb76cb64d2e24f782afc56af872467fc32b30374d18c4729374984"
+      "bytes": 1195,
+      "sha256": "d5bbc1227574e6138216be70021f68938dbdb0350a46368e5b374f794fe20a03"
     },
     {
       "arquivo": "docs/benchmarks.json",
@@ -91,6 +87,11 @@
       "arquivo": "docs/registro_end_plates.json",
       "bytes": 1919,
       "sha256": "5e98dbd9bc3f1081f02fa81c02f6eb160d33616dd4ad743776a84042fb08fb7b"
+    },
+    {
+      "arquivo": "docs/registro_v071.json",
+      "bytes": 10418,
+      "sha256": "b817fdf60e1b9e07a47bf2e6c345bba8ee2efcfd30a916f6e6b6cd2e53aa8d15"
     },
     {
       "arquivo": "docs/registro_validacao.json",
@@ -208,9 +209,44 @@
       "sha256": "9fec1dc1b5fa49b90ca87931d95c0394109af4fca8de683e91c34feb4863f2dc"
     },
     {
+      "arquivo": "examples/Projeto_usuario_W150_W250.json",
+      "bytes": 2306,
+      "sha256": "ecfb0b7b9ea0d13898d11beeacd9fcba449dedb5e12c677847eee50e6d8a377b"
+    },
+    {
       "arquivo": "examples/Referencia_didatica.json",
       "bytes": 2525,
       "sha256": "8cdc748844e3ccb7ad3c5b4f2c0a879ff19701f427b7ae7fba2e20b4a9143d6c"
+    },
+    {
+      "arquivo": "examples/Teste_usuario_W150_W250.docx",
+      "bytes": 128515,
+      "sha256": "d06408c57d22b5cd60da142a23d83c3d22d0559107006da559fc79c965cef91f"
+    },
+    {
+      "arquivo": "examples/Teste_usuario_W150_W250.json",
+      "bytes": 2332,
+      "sha256": "7950d136fbd28d09d4e891f71982546595abca694fb856448cfc128752016c5d"
+    },
+    {
+      "arquivo": "examples/Teste_usuario_W150_W250.svg",
+      "bytes": 57065,
+      "sha256": "46258cba393cef0fd70af7cb4862dc69f496944b6d667a2ea073cf63c2cd10a1"
+    },
+    {
+      "arquivo": "examples/Teste_usuario_com_complemento.docx",
+      "bytes": 138318,
+      "sha256": "429feb1ba0290683f17fe9276cda6949063ebeaa8ff94f0ca14f66ef205897d3"
+    },
+    {
+      "arquivo": "examples/Teste_usuario_com_complemento.json",
+      "bytes": 2379,
+      "sha256": "b5cc2e1bce9cb0230d071b259e8572e4d8832f2a65efd734bf88f8ba250f51c1"
+    },
+    {
+      "arquivo": "examples/Teste_usuario_com_complemento.svg",
+      "bytes": 59990,
+      "sha256": "88053ab9856769f727203d9d384c2d4355964f31a2ab0e0d79d77ceefdf48234"
     },
     {
       "arquivo": "examples/Teste_usuario_v03_original.json",
@@ -249,8 +285,8 @@
     },
     {
       "arquivo": "lro/double_cover.py",
-      "bytes": 22210,
-      "sha256": "8d0b80a9e1288ba0645710b3d57fe1198c473896beca74b6702799568d07d929"
+      "bytes": 22520,
+      "sha256": "c4786c0042ac4d39a1fedde6735e92f70754863b4fc63d853975f6d4f3c675d0"
     },
     {
       "arquivo": "lro/double_cover_drawing.py",
@@ -259,13 +295,13 @@
     },
     {
       "arquivo": "lro/double_cover_report.py",
-      "bytes": 14316,
-      "sha256": "fe67d8c268d3dc9302aa8ae79e9232759eb83c21c52d31f9ce9512e7f5d8e71e"
+      "bytes": 14537,
+      "sha256": "910ce42a4bdd57009bbfdd4a6d40767c940c3705c4491d00de04f646e9691090"
     },
     {
       "arquivo": "lro/double_cover_ui.py",
-      "bytes": 13089,
-      "sha256": "49560bf649298994832c10ccd3ed0941c3e278d6f9f56c5130fcce4b6c1f08a9"
+      "bytes": 13244,
+      "sha256": "a47cd90c41599c67aeb5d77fab7c225adafda18c5bd3d648aabafa997af80cf8"
     },
     {
       "arquivo": "lro/drawing.py",
@@ -274,8 +310,8 @@
     },
     {
       "arquivo": "lro/end_plate.py",
-      "bytes": 27148,
-      "sha256": "994f1091774d5972200fee2d5d1247362c4b3201d3a1f9e644be7607f4e5bf6a"
+      "bytes": 27773,
+      "sha256": "db3e11a9e30f59ac17e8036031c8542bf7cce99fd2f4346505026e534cf49353"
     },
     {
       "arquivo": "lro/end_plate_drawing.py",
@@ -289,13 +325,13 @@
     },
     {
       "arquivo": "lro/end_plate_ui.py",
-      "bytes": 11185,
-      "sha256": "30350588e2b6e403fcb93806fa32de2abd7951c2de124775f7d7a6a0c0c07779"
+      "bytes": 11360,
+      "sha256": "0cca51c6bd24b3ce03522130fd901c636fda60dca05ad2a76ba02b081ada9da2"
     },
     {
       "arquivo": "lro/engine.py",
-      "bytes": 25369,
-      "sha256": "44403f440bd8d2cc944e20f540b25c9ec29596052cf212ec2132923873a76200"
+      "bytes": 27283,
+      "sha256": "11f9e2edc94d58de518394a29163e562709d9c4320839b702fb64f8c5ba08545"
     },
     {
       "arquivo": "lro/examples.py",
@@ -309,13 +345,13 @@
     },
     {
       "arquivo": "lro/models.py",
-      "bytes": 9254,
-      "sha256": "741047b7def2895389459d972d13ccf41ce61713290552e52d3ac825b3bb931c"
+      "bytes": 10111,
+      "sha256": "3f60b088e85650bcc95805afd9c4289f1a8404645b38a57caee83200d6ccb688"
     },
     {
       "arquivo": "lro/report.py",
-      "bytes": 25691,
-      "sha256": "5d70948129310a4ce399e0c5f2210fcfced42cc193fa942c5d93f27ae9cf8acf"
+      "bytes": 24887,
+      "sha256": "fc18c8d0b196b47fb72f38d790684b7fd38b572d1845219facf2b0f05eaa4cf7"
     },
     {
       "arquivo": "lro/support_checks.py",
@@ -334,13 +370,13 @@
     },
     {
       "arquivo": "tests/test_app.py",
-      "bytes": 4194,
-      "sha256": "7282f989f25c3a61dcf0fe4e3782c28afdd6133bfa983a13791b5ef18b002d0c"
+      "bytes": 4324,
+      "sha256": "c32a2020dc1db99dfb852bb7f548e36e1d37b1c95653de7e79de4d16398c3a43"
     },
     {
       "arquivo": "tests/test_double_cover.py",
-      "bytes": 7276,
-      "sha256": "7bb4c47069936e9c7df9e9853dc9cc98353c81daeb2f4578392a6d353d529ee8"
+      "bytes": 7418,
+      "sha256": "c9fc519df8610018b6ec730a92e9b711e5a53522dbae18b01fe5a9eefb6e2e05"
     },
     {
       "arquivo": "tests/test_double_cover_app.py",
@@ -349,8 +385,8 @@
     },
     {
       "arquivo": "tests/test_end_plate.py",
-      "bytes": 4558,
-      "sha256": "6f3641f39615ba9709ae0868a72344abe32c0ac4986759965058555e5dd3dd8d"
+      "bytes": 4678,
+      "sha256": "3451f349e70c1e0ad6815c8381beeef78625cf1436c8130a98e9ad670d857b5a"
     },
     {
       "arquivo": "tests/test_end_plate_app.py",
@@ -359,18 +395,18 @@
     },
     {
       "arquivo": "tests/test_engine.py",
-      "bytes": 11670,
-      "sha256": "a151e449b518e2fc9dd23e112b4bc770149f2d3a5856b20c2464f9888c3f336d"
+      "bytes": 11580,
+      "sha256": "ef8049a1d850e07857fdf10f1cac2e47bcce4854e12c654103ffaa726e486953"
     },
     {
       "arquivo": "tests/test_v03.py",
-      "bytes": 5887,
-      "sha256": "b227184ddc5de232f4f9eb5a2f819e36c00728c0d97bd8cc61e738f41b94a6fe"
+      "bytes": 5873,
+      "sha256": "ff9683d04e1b24186fd9952c955a413d06f26ec08be08aae22f2363d151bf8ef"
     },
     {
       "arquivo": "tests/test_v04.py",
-      "bytes": 4819,
-      "sha256": "e53197e85311790b50a4e93e6535379360ff7df917370c93b6ffb770b3532b7d"
+      "bytes": 4859,
+      "sha256": "82e5eac4edf2b5053a414df94b47c129585980bc4af21d25e9f667837e92ae0c"
     },
     {
       "arquivo": "tests/test_v05.py",
@@ -381,6 +417,11 @@
       "arquivo": "tests/test_v051.py",
       "bytes": 2716,
       "sha256": "149bcfb09da5c4bea474f651433e9c3b2763441be071a0e8c0307d828d559895"
+    },
+    {
+      "arquivo": "tests/test_v071.py",
+      "bytes": 5099,
+      "sha256": "e4258b16a8d0a937c48590f74a1f2e9d065bfd656a354f84f1f743b8be893bf6"
     }
   ]
 }

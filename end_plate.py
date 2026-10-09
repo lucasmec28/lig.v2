@@ -6,7 +6,7 @@ Não se extrapolam os intervalos ensaiados nem se converte uma tabela LRFD.
 """
 from dataclasses import dataclass, asdict, fields
 import math
-from .models import Profile, Check, Issue, Result, STEELS, BOLTS, DIAMETERS, VERSION, profiles
+from .models import Profile, Check, Issue, Result, STEELS, BOLTS, DIAMETERS, VERSION, profiles, INTERFERENCE_ASSUMPTION
 from .engine import bolt_shear
 from .local_checks import grip_factor, web_shear
 from .column_checks import crippling_point
@@ -127,6 +127,7 @@ def tributaries(rows,lo,hi,b):
 def validate(c):
     out=[]
     def err(t,ref='Geometria e domínio do modelo'):out.append(Issue('error',t,ref))
+    def interference(t):out.append(Issue('interference',t))
     nums=[f.name for f in fields(c) if isinstance(getattr(c,f.name),(int,float)) and not isinstance(getattr(c,f.name),bool)]
     if any(not math.isfinite(getattr(c,k)) for k in nums):err('Todos os números devem ser finitos.');return out
     if any(getattr(c,k)<=0 for k in ('db','tp','bp','gauge','pitch','overhang','pfi','pfo','edge','weld','fw','tool_radius')):err('Dimensões e resistências devem ser positivas.');return out
@@ -148,9 +149,11 @@ def validate(c):
     if c.bp>min(s.bf,b.bf+max(25.4,c.tp))+1e-6 and c.kind=='moment':err('Largura efetiva da end plate deve caber na coluna e ser ≤ bf da viga + max(25,4 mm; tp).',DG+', 3.4')
     if c.bp>s.bf:err('A chapa ultrapassa a largura da mesa da coluna.')
     if c.bp<b.bf+2*c.weld and c.kind=='pinned':err('A largura da chapa não deixa espaço lateral para os filetes das mesas.')
-    if (min(c.bp,s.bf)-c.gauge)/2<max(edge_min,c.tool_radius):err('Borda lateral insuficiente para o furo ou a ferramenta.')
+    lateral_edge=(min(c.bp,s.bf)-c.gauge)/2
+    if lateral_edge<edge_min:err('Borda lateral insuficiente para o furo.')
+    elif lateral_edge<c.tool_radius:interference('Envelope de montagem ultrapassa a borda lateral da chapa ou da mesa da coluna.')
     root_b=(b.d-b.clear)/2;root_c=(s.d-s.clear)/2-s.tf
-    if c.gauge/2<=max(b.tw/2+c.weld,s.tw/2+max(root_c,0))+c.tool_radius:err('O gabarito dos parafusos interfere com a alma, concordância ou solda.')
+    if c.gauge/2<=max(b.tw/2+c.weld,s.tw/2+max(root_c,0))+c.tool_radius:interference('O gabarito dos parafusos interfere com a alma, concordância ou solda.')
     if any(y2-y1<8*c.db/3 for y1,y2 in zip(rows,rows[1:])):err('Passo entre linhas inferior a 8db/3.',NBR+', 6.3.7')
     if c.gauge<8*c.db/3:err('Gabarito horizontal inferior a 8db/3.',NBR+', 6.3.7')
     pmax=min(24*min(c.tp,s.tf),300.)
@@ -160,15 +163,18 @@ def validate(c):
         err('Distância máxima à borda da chapa excede min(12tp;150 mm).',NBR+', 6.3.12')
     # Parafusos externos não podem interceptar a mesa; internos precisam deixar ferramenta.
     for y in rows:
-        if 0<=y<=b.d and not root_b+c.weld+c.tool_radius<=y<=b.d-root_b-c.weld-c.tool_radius:err('Linha interna interfere com mesa, concordância, solda ou ferramenta.');break
-        if y<0 and -y<c.tool_radius+c.weld:err('Linha superior externa muito próxima da mesa.');break
-        if y>b.d and y-b.d<c.tool_radius+c.weld:err('Linha inferior externa muito próxima da mesa.');break
-    if min(rows[0]+c.ext_top,b.d+c.ext_bottom-rows[-1])<max(edge_min,c.tool_radius):err('Distância do furo à borda superior/inferior insuficiente.')
+        if 0<=y<=b.d and not root_b+c.weld+c.tool_radius<=y<=b.d-root_b-c.weld-c.tool_radius:interference('Linha interna interfere com mesa, concordância, solda ou ferramenta.');break
+        if y<0 and -y<c.tool_radius+c.weld:interference('Linha superior externa muito próxima da mesa.');break
+        if y>b.d and y-b.d<c.tool_radius+c.weld:interference('Linha inferior externa muito próxima da mesa.');break
+    vertical_edge=min(rows[0]+c.ext_top,b.d+c.ext_bottom-rows[-1])
+    if vertical_edge<edge_min:err('Distância do furo à borda superior/inferior insuficiente.')
+    elif vertical_edge<c.tool_radius:interference('Envelope de montagem ultrapassa a borda superior/inferior da chapa.')
     if c.kind=='pinned':
+        if min(rows)<=b.tf or max(rows)>=b.d-b.tf:err('Na rotulada, as linhas de parafusos devem ficar entre as mesas da viga.')
         if abs(c.M)>1e-9:err('Ligação rotulada recebe somente V e N; remova o momento externo.')
         if not 90<=c.gauge<=140:err('Para a rótula de altura total, usar gabarito entre 90 e 140 mm.',SCI)
         if sp.fy>275:err('A classificação rotulada deste modelo está limitada a chapa com fy ≤ 275 MPa; use A36.',SCI)
-        if c.overhang<c.weld:err('A sobra superior/inferior deve acomodar o filete.')
+        if c.overhang<c.weld:interference('A sobra superior/inferior deve acomodar o filete.')
         if c.overhang>10:err('A sobra da rotulada é limitada a 10 mm neste modelo; valor usual 5 mm.')
         if (c.n-1)*c.pitch<b.d/2:err('O grupo da rotulada deve abranger ao menos metade da altura da viga.')
         tmax=min(b.tw,b.tf,c.tp) if c.reinforced_edge else min(b.tw,b.tf,c.tp)-1.5
@@ -185,6 +191,7 @@ def validate(c):
         if c.layout=='top' and c.M<=0:err('Extensão só acima: este modelo 4E exige M > 0 (tração na mesa superior). Para inversão, escolha extensão acima e abaixo.')
         if abs(c.M)<1e-6 or abs(c.N)*(b.d-b.tf)>abs(c.M):err('O modelo de engaste 4E exige momento dominante: |N|(d−tf) ≤ |M|. Para axial dominante, é necessário outro modelo de distribuição.',DG+', 3.5')
     if max(abs(c.V),abs(c.N),abs(c.M))==0:err('Informe pelo menos um esforço não nulo.')
+    if any(i.severity=='interference' for i in out):out.append(Issue('excluded',INTERFERENCE_ASSUMPTION))
     if not c.norm_minimum:out.append(Issue('pending','Conferência normativa mínima desativada: modo de comparação.',NBR+', 6.1.5'))
     return out
 

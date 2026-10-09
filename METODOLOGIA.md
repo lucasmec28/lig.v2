@@ -1,5 +1,7 @@
 # Metodologia de cálculo da versão 0.5.1
 
+> Registro técnico histórico. A versão 0.7.1 permite calcular com avisos de montagem e restaura o complemento entre mesas apenas no detalhamento, sem verificações extras nem crédito resistente. As referências ao bloqueio dessa opção descrevem o comportamento anterior. Consulte AJUSTES_V071.md.
+
 ## Base e unidades
 
 NBR 8800:2024, versão corrigida 2025, prevalece sobre valores divergentes de exemplos antigos. AISC Manual 16 e Companion P901-23W e SCI P358 são complementos identificados. O catálogo de fontes está em fontes.json. Não são redistribuídos manuais de terceiros.

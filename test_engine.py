@@ -75,7 +75,9 @@ def test_compression_never_reinterpreted_as_tension(referencia):
 
 def test_no_cope_detects_flange_interference():
     c=replace(next(iter(presets().values())),gap=10,a=75)
-    assert any(i.severity=='error' and 'mesa superior' in i.text for i in evaluate(c).issues)
+    r=evaluate(c)
+    assert r.checks
+    assert any(i.severity=='interference' and 'mesa superior' in i.text for i in r.issues)
 
 
 def test_cope_pure_shear_with_fixed_restraint_is_in_scope():
@@ -208,31 +210,29 @@ def test_manual_plate_position_changes_axial_moment(referencia):
     assert ma-mb==pytest.approx(40000)
 
 
-def test_removed_variant_still_preserves_legacy_geometry_without_approving_it():
+def test_complement_preserves_outline_without_strength_credit():
     from lro.detailing import plate_outline,polygon_area
     c=replace(next(iter(presets().values())),plate_shape='between_flanges')
     pts=plate_outline(c)
     assert min(y for x,y in pts)==c.support.tf
     assert max(y for x,y in pts)==c.support.d-c.support.tf
     assert polygon_area(pts)==pytest.approx(c.root_width*c.root_height-c.corner_clip**2+(c.width-c.root_width)*c.hp)
-    for variant in (c,replace(c,opposite_stiffener=True)):
-        result=evaluate(variant)
-        assert not result.checks and not result.actual
-        assert any(i.severity=='error' and 'não são avaliados' in i.text for i in result.issues)
+    assert evaluate(c).checks==evaluate(replace(c,plate_shape='rectangular')).checks
+    assert not evaluate(replace(c,opposite_stiffener=True)).checks
 
 
 @pytest.mark.parametrize('changes,text',[
-    ({'root_width':72},'ponta da viga'),
-    ({'corner_clip':5},'Alívio de canto insuficiente'),
-    ({'opposite_stiffener':True,'stiffener_width':100},'Largura do enrijecedor'),
+    ({'root_width':500},'Dimensões inválidas'),
+    ({'corner_clip':-5},'Dimensões inválidas'),
+    ({'opposite_stiffener':True,'stiffener_width':100},'enrijecedor oposto'),
     ({'kind':'column_flange'},'apenas na alma'),
-    ({'flange_weld':2},'Solda às mesas'),
-    ({'opposite_stiffener':True,'stiffener_weld':2},'Filete do enrijecedor'),
+    ({'flange_weld':0},'Dimensões inválidas'),
+    ({'opposite_stiffener':True,'stiffener_weld':2},'enrijecedor oposto'),
 ])
 def test_full_depth_interference_and_weld_gates(changes,text):
     c=replace(next(iter(presets().values())),plate_shape='between_flanges',**changes)
     r=evaluate(c)
-    assert any(x.severity=='error' and 'variante retirada' in x.text for x in r.issues)
+    assert any(x.severity=='error' and text in x.text for x in r.issues)
     assert not r.checks
 
 
@@ -250,7 +250,7 @@ def test_two_columns_roundtrip_and_calculation():
 def test_removed_variant_cannot_export_a_new_resistance_report():
     from lro.report import create_report
     c=replace(next(iter(presets().values())),plate_shape='between_flanges',opposite_stiffener=True)
-    with pytest.raises(ValueError,match='não são avaliados'):
+    with pytest.raises(ValueError,match='enrijecedor oposto'):
         create_report(c,evaluate(c))
 
 

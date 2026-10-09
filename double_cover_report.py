@@ -132,6 +132,9 @@ def create_report(c,r,detailed=False):
     doc.add_paragraph('Premissas adotadas',style='Heading 1')
     doc.add_paragraph('Modelo plano; contenção eficaz da viga; juntas internas dos perfis soldados de penetração total; ausência de ações fora do plano e de efeitos de fadiga, vibração ou carregamento cíclico.')
     doc.add_paragraph(ASSEMBLY_NOTE+' A análise global dos membros e a estabilidade fora do plano permanecem no projeto da estrutura.')
+    for issue in r.issues:
+        if issue.severity=='interference':doc.add_paragraph('Aviso de montagem: '+issue.text)
+        elif issue.severity=='excluded' and issue.text!=ASSEMBLY_NOTE:doc.add_paragraph(issue.text)
     doc.add_paragraph(BRAND)
     p=doc.add_paragraph('LRO Ligações '+VERSION+' · ');hyperlink(p,'LinkedIn — Lucas Oliveira',LINK)
     out=BytesIO();doc.save(out);return out.getvalue()

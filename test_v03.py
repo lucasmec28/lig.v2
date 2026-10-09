@@ -123,10 +123,9 @@ def test_two_columns_net_cut_deducts_one_vertical_hole_line():
     assert len(r)>=24
 
 
-def test_partial_new_checks_do_not_approve_full_depth_or_web_tension():
+def test_complement_keeps_two_column_single_plate_checks():
     c=replace(next(iter(presets().values())),restrained=True)
     assert evaluate(c).status=='ATENDE ÀS VERIFICAÇÕES REALIZADAS'
     full=evaluate(replace(c,plate_shape='between_flanges',bolt_columns=2))
-    assert not full.checks
-    assert all(x.id.startswith(('full_','opposite_')) for x in full.checks)
-    assert full.status=='GEOMETRIA INVÁLIDA'
+    assert full.checks==evaluate(replace(c,bolt_columns=2)).checks
+    assert not any(x.id.startswith(('full_','opposite_')) for x in full.checks)

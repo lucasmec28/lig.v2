@@ -158,8 +158,8 @@ def _math(doc,expr):
 
 
 def create_report(c,r,detailed=False):
-    if c.full_depth or c.opposite_stiffener:
-        raise ValueError('Chapa entre mesas e enrijecedor oposto não são avaliados nesta versão.')
+    if c.opposite_stiffener or (c.full_depth and c.kind!='beam_web'):
+        raise ValueError('Complemento apenas em viga–viga, sem enrijecedor oposto nesta versão.')
     doc=Document();s=doc.sections[0]
     s.page_width=Inches(8.5);s.page_height=Inches(11)
     s.top_margin=s.bottom_margin=Inches(.6);s.left_margin=s.right_margin=Inches(.7)
@@ -173,7 +173,7 @@ def create_report(c,r,detailed=False):
     doc.styles['Heading 1'].font.size=Pt(12);doc.styles['Heading 2'].font.size=Pt(10)
     doc.core_properties.author='LRO Soluções de engenharia LTDA.'
     doc.core_properties.title='Memória de cálculo de ligação com chapa simples'
-    doc.add_paragraph('Verificações parciais da chapa entre mesas' if c.full_depth else ('Ligação com chapa simples' if r.checks else 'Pré-detalhamento de ligação'),style='Title')
+    doc.add_paragraph('Ligação com chapa simples' if r.checks else 'Pré-detalhamento de ligação',style='Title')
     doc.add_paragraph(c.project)
     doc.add_paragraph(f'{c.beam.name} → {c.support.name} | '+('Alma da viga de apoio' if c.kind=='beam_web' else 'Mesa do pilar alinhada à alma'))
     p=doc.add_paragraph();p.add_run(r.status).bold=True
@@ -186,19 +186,19 @@ def create_report(c,r,detailed=False):
         doc.add_paragraph('Conclusão condicionada às pendências de escopo registradas abaixo. Os estados limite ainda não verificados não estão aprovados.')
     else:doc.add_paragraph('As verificações locais incluídas nesta versão atendem para a geometria e as hipóteses registradas. A análise global dos membros e os requisitos globais de integridade estrutural permanecem no projeto da estrutura.')
     if not r.checks:doc.add_paragraph('Somente geometria e materiais: não há resistência calculada nem aprovação estrutural desta configuração.')
-    elif c.full_depth:
-        doc.add_paragraph('SEM APROVAÇÃO DA LIGAÇÃO. Calculados somente o grupo elástico de soldas, o metal-base local e condições de compacidade. Esses índices não verificam os parafusos, a estabilidade acoplada, a capacidade de rotação ou as forças e soldas do enrijecedor oposto.')
+    interferences=[i for i in r.issues if i.severity=='interference']
+    if interferences:doc.add_paragraph('Cálculo realizado com avisos de interferência. As dimensões nominais informadas foram mantidas; os avisos de montagem constam nas premissas finais.')
     doc.add_picture(BytesIO(image_bytes(c)),width=Inches(7.05))
     doc.add_paragraph('Dimensões e materiais adotados',style='Heading 1')
     geom=[('Chapa',f'{number(c.width)} × {number(c.hp)} × {number(c.tp,4)} mm',c.plate_steel),('Parafusos',f'{c.n} × Ø {number(c.db,3)} mm',c.bolt),('Furos',f'Ø {number(c.dh,4)} mm', 'Padrão; '+('broca' if c.drilled else 'desconto líquido +2 mm')),('Soldas',f'2 filetes de {number(c.weld)} mm; L = {number(c.hp)} mm',f'fw = {number(c.fw,0)} MPa'),('Posições',f'z = {c.plate_top:g}; a = {c.a:g}; g = {c.gap:g}; p = {c.pitch:g}; eᵥ = eₕ = {c.edge_v:g}' if c.edge_v==c.edge_h else f'z = {c.plate_top:g}; a = {c.a:g}; g = {c.gap:g}; p = {c.pitch:g}; eᵥ = {c.edge_v:g}; eₕ = {c.edge_h:g}', 'mm'),('Viga apoiada',f'd/bf/tw/tf = {c.beam.d:g}/{c.beam.bf:g}/{c.beam.tw:g}/{c.beam.tf:g}',c.beam_steel),('Apoio',f'd/bf/tw/tf = {c.support.d:g}/{c.support.bf:g}/{c.support.tw:g}/{c.support.tf:g}',c.support_steel)]
     geom[1]=('Parafusos',f'{c.n*c.bolt_columns} × Ø {number(c.db,3)} mm; {c.n} linhas × {c.bolt_columns} coluna(s)',c.bolt)
     if c.full_depth:
         geom[0]=('Chapa recortada',f'Aba: {number(c.width)} × {number(c.hp)} mm; t = {number(c.tp,4)} mm',c.plate_steel)
-        geom[3]=('Soldas',f'Alma: w = {number(c.weld)} mm; mesas: w = {number(c.flange_weld)} mm',f'fw = {number(c.fw,0)} MPa; grupo elástico isolado')
+        geom[3]=('Soldas',f'Alma: w = {number(c.weld)} mm, L calculado = {number(c.hp)} mm; mesas: w = {number(c.flange_weld)} mm',f'fw = {number(c.fw,0)} MPa; soldas adicionais sem crédito no cálculo')
         geom.append(('Entre mesas',f'H = {number(c.root_height)}; bᵣ = {number(c.root_width)}; c = {number(c.corner_clip)} mm','Alívios a 45°; chapa soldada à alma e mesas'))
         if c.opposite_stiffener:geom.append(('Enrijecedor oposto',f'H = {number(c.root_height)}; bₑ = {number(c.stiffener_width)}; t = {number(c.stiffener_t,4)}; w = {number(c.stiffener_weld)} mm',c.stiffener_steel))
     if c.bolt_columns>1:geom.append(('Passo horizontal',f's = {number(c.gauge)} mm','Grupo bidimensional; furos alinhados'))
-    if c.kind=='beam_web' and c.N>0 and not c.full_depth and not c.support_web_combined_excluded:
+    if c.kind=='beam_web' and c.N>0 and not c.support_web_combined_excluded:
         geom.append(('Alma do apoio',f'Distância longitudinal livre = {number(c.support_edge_distance)} mm' if c.support_edge_distance else 'Distância longitudinal livre não informada','Menor valor nos dois sentidos a partir do eixo da chapa'))
     if c.kind=='column_flange' and c.support.family in ('CS','CVS','VS','Soldado'):
         geom.append(('Fabricação do perfil','Juntas mesa–alma de penetração total','Metal de adição compatível; hipótese de projeto'))
@@ -224,17 +224,16 @@ def create_report(c,r,detailed=False):
     if c.notes:doc.add_paragraph(c.notes)
     doc.add_paragraph('Referências e limites de aplicação',style='Heading 1')
     doc.add_paragraph('ABNT NBR 8800:2024, errata 2025: 5.2.4; 5.7; 6.1.5.2; 6.2; 6.3; 6.5 e Anexo A. AISC Companion v16.0, Volume 1, P901-23W: exemplos II.A-6, II.A-7, II.A-17B, II.A-18 e II.A-19B. SCI P358 (2014), seção 5. Muir e Hewitt (2009), Engineering Journal 46(2), p.67–80. Dowswell (2018), Engineering Journal 55(4), p.231–242. Procedimentos complementares AISC/SCI identificados por verificação, com resistências e coeficientes explicitados.')
-    if c.full_depth:doc.add_paragraph('Chapas estendidas: Muir e Hewitt, Engineering Journal 46(2), 2009, p.67–80; Thornton e Fortney, Engineering Journal 48(2), 2011; Motallebi, Lignos e Rogers, Journal of Constructional Steel Research 148, 2018, p.336–350. Referências para delimitação do modelo e condição de compacidade; não constituem validação desta variante na versão atual.')
     if any(name.startswith('USI-CIVIL') for label,name in material_list):
         doc.add_paragraph('USI-CIVIL: propriedades mínimas e espessuras de 6 a 75 mm conforme Usiminas, Catálogo de chapas grossas, jul. 2022, p.29. Aplicação em chapas e perfis soldados; não são especificações de perfis W laminados.')
         hyperlink(doc.add_paragraph(),'Catálogo Usiminas — fonte das propriedades','https://usiminas.com/wp-content/uploads/2024/04/CatalagoChapasGrossas.pdf')
-    doc.add_paragraph(f'Versão {VERSION}, escopo delimitado: uma viga, tração axial e cortante no plano. A chapa/enrijecedores entre mesas não são avaliados nesta versão. Não inclui fadiga, atrito, ações cíclicas ou incêndio. O mínimo normativo é avaliado pela resultante; a análise global das barras é externa.')
-    if c.kind=='beam_web' and c.N>0 and not c.full_depth and not c.support_web_combined_excluded:
+    doc.add_paragraph(f'Versão {VERSION}, escopo delimitado: uma viga, tração axial e cortante no plano. O mínimo normativo é avaliado pela resultante. Premissas e limites do modelo no tópico final.')
+    if c.kind=='beam_web' and c.N>0 and not c.support_web_combined_excluded:
         doc.add_paragraph('Plastificação da alma: AISC Manual 16, eq.9-45; P901 II.A-19B, IIA-228; Kapp, Engineering Journal 11(2), 1974, p.38–41. A expressão é aplicada somente à tração direta centrada, sem cortante, e exige a distância longitudinal livre indicada.')
     if pending:
         doc.add_paragraph('Pendências para conclusão',style='Heading 2')
         for i in pending:doc.add_paragraph((i.origin_label+': ' if i.severity=='pending' else 'Geometria: ')+i.text)
-    doc.add_paragraph(('Resumo dos componentes isolados' if c.full_depth else 'Resumo das verificações') if r.checks else 'Cobertura do pré-detalhamento',style='Heading 1')
+    doc.add_paragraph('Resumo das verificações' if r.checks else 'Cobertura do pré-detalhamento',style='Heading 1')
     checkrows=[]
     for x in r.checks:
         sd,unit=display(x.demand,x.unit);rd,_=display(x.resistance,x.unit)
@@ -248,11 +247,6 @@ def create_report(c,r,detailed=False):
         doc.add_paragraph('Conferidas as dimensões, o arranjo dos furos, os envelopes de montagem e os limites geométricos de solda implementados. Não foram verificadas resistências, redistribuição de esforços, estabilidade ou capacidade de rotação do conjunto. O mínimo normativo de força também não foi aplicado a resistências nesta variante.')
         doc.add_paragraph(f'Área geométrica da chapa, antes da dedução dos furos: {number(polygon_area(plate_outline(c)))} mm². Essa área serve apenas para detalhamento e não define uma área resistente equivalente.')
     if detailed:selected=r.checks
-    elif c.full_depth:
-        selected=[]
-        for prefix in ('full_weld_','full_base_','full_compactness','opposite_compactness'):
-            candidates=[x for x in r.checks if x.id.startswith(prefix)]
-            if candidates:selected.append(max(candidates,key=lambda x:x.ratio))
     else:
         groups=[['bolts'],['bearing_plate','bearing_beam'],['plate_ltb','plate_mu','interaction_y','interaction_u','block_plate','block_plate_u','block_plate_partial_u','partial_plate_l'],['beam_v','beam_n','block_beam_u','beam_vm','beam_buckling','cope_interaction','cope_rupture','cope_block','block_beam_partial_u','partial_beam_l'],['weld','base_plate'],['support_shear','support_punch','support_web_y','support_flange','support_joint_weld','support_joint_base'],['support_crippling'],['ductility','weld_development']]
         selected=[]
@@ -276,6 +270,9 @@ def create_report(c,r,detailed=False):
     doc.add_paragraph('Modelo plano, contenção eficaz da viga e juntas internas mesa–alma dos perfis soldados com penetração total e metal de adição compatível. Deslocamento lateral relativo entre as mesas da coluna impedido por hipótese. Não se incluem a análise global da estrutura, atrito, fadiga, vibração ou ações cíclicas.')
     for issue in r.issues:
         if issue.severity=='excluded':doc.add_paragraph(issue.text)
+    if interferences:
+        doc.add_paragraph('Avisos de montagem',style='Heading 2')
+        for issue in interferences:doc.add_paragraph(issue.text)
     p=s.footer.paragraphs[0];p.paragraph_format.space_after=Pt(0)
     r0=p.add_run(BRAND+' ');r0.font.size=Pt(7)
     hyperlink(p,'LinkedIn de Lucas Oliveira',LINK)

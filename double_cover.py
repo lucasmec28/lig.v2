@@ -6,7 +6,7 @@ Unidades internas: N, mm, MPa. Nenhuma majoração adicional de ações.
 """
 from dataclasses import dataclass, asdict
 import math
-from .models import Profile, Check, Issue, Result, STEELS, BOLTS, DIAMETERS, VERSION, profiles
+from .models import Profile, Check, Issue, Result, STEELS, BOLTS, DIAMETERS, VERSION, profiles, INTERFERENCE_ASSUMPTION
 from .engine import bolt_shear, plate_ltb
 from .local_checks import elastic_group, grip_factor
 
@@ -157,14 +157,15 @@ def geometry(c):
     for name,e,t in [('vertical das talas/nervura',c.edge_v,min(c.cover_t,c.fin_t)),('horizontal da emenda',c.edge_x,min(c.cover_t,c.fin_t,c.beam.tw))]:
         if e<max(emin,c.dh/2):add('error',f'Borda {name} inferior a {emin} mm.',NBR+', tabela 16')
         if e>min(12*t,150):add('error',f'Borda {name} excede min(12t;150 mm).',NBR+', 6.3.12')
-    if c.hp>=c.beam.clear-2*c.clearance:add('error','Talas invadem mesas/concordâncias da viga; reduza altura ou aumente o perfil.')
-    if (c.beam.clear-(c.n-1)*c.pitch)/2<c.tool_radius:add('error','Porca/ferramenta interfere na concordância da viga.')
-    if c.extension<2*c.edge_x+c.clearance:add('error','A tala invade a coluna: adote u ≥ 2e + folga de montagem.')
-    if c.extension-c.edge_x<c.tool_radius+c.weld_stiffener_column:add('error','Grupo na nervura sem acesso para porca/ferramenta junto à mesa da coluna.')
-    if c.root_height<c.hp+2*(c.clearance+c.weld_fin_stiffener):add('error','Distância entre horizontais insuficiente para a tala e as soldas.')
+    if c.hp>=c.beam.clear-2*c.clearance:add('interference','Talas invadem mesas/concordâncias da viga; reduza altura ou aumente o perfil.')
+    if (c.beam.clear-(c.n-1)*c.pitch)/2<c.tool_radius:add('interference','Porca/ferramenta interfere na concordância da viga.')
+    if c.extension<2*c.edge_x+c.clearance:add('interference','A tala invade a coluna: adote u ≥ 2e + folga de montagem.')
+    if c.extension-c.edge_x<c.tool_radius+c.weld_stiffener_column:add('interference','Grupo na nervura sem acesso para porca/ferramenta junto à mesa da coluna.')
+    if c.root_height<c.hp+2*(c.clearance+c.weld_fin_stiffener):add('interference','Distância entre horizontais insuficiente para a tala e as soldas.')
     radius=(c.support.d-2*c.support.tf-c.support.clear)/2
-    if c.corner_clip<radius:add('error',f'Alívio de canto menor que a concordância estimada da coluna ({radius:.2f} mm).')
+    if c.corner_clip<radius:add('interference',f'Alívio de canto menor que a concordância estimada da coluna ({radius:.2f} mm).')
     if c.corner_clip>=min(c.projection,c.stiffener_span/2)/2:add('error','Alívio de canto elimina parcela excessiva do enrijecedor.')
+    if (c.n-1)*c.pitch+c.dh_net>=c.beam.d:add('error','Um furo ultrapassa a seção da viga; ligamento resistente inválido.')
     if c.hp-c.n*c.dh_net<=0:add('error','Os furos eliminam a seção líquida das talas/nervura.')
     if c.shim_mode=='fit' and c.thickness_difference>c.fit_tolerance:add('error','Diferença de espessuras excede a tolerância de montagem adotada; utilize calços simétricos.')
     if c.shim_mode=='automatic' and c.thickness_difference>19:add('error','Soma dos calços excede 19 mm; revise espessuras ou use detalhamento específico.',NBR+', 6.5.7.2')
@@ -262,7 +263,9 @@ def strength(c,V,N,case):
 
 
 def evaluate(c):
-    issues,g=geometry(c);r=Result(issues=issues,geometry=g)
+    issues,g=geometry(c)
+    if any(i.severity=='interference' for i in issues):issues.append(Issue('excluded',INTERFERENCE_ASSUMPTION))
+    r=Result(issues=issues,geometry=g)
     if any(x.severity=='error' for x in issues):return r
     if c.V==0 and c.N==0:return r
     r.actual,actual_actions=strength(c,c.V,c.N,'Entrada')

@@ -1,4 +1,4 @@
-# LRO Ligações 0.7.0
+# LRO Ligações 0.7.1
 
 Desenvolvido por LRO Soluções de engenharia LTDA.
 
@@ -40,7 +40,15 @@ O pacote não altera automaticamente o app hospedado. Para Streamlit Cloud, atua
 
 N positivo é tração; N negativo é compressão. Na end plate engastada, M positivo traciona a mesa superior. A ligação com extensão somente acima aceita esse sentido de momento; para o sentido inverso, use extensão também abaixo.
 
-## O que mudou nesta versão
+## Ajustes da versão 0.7.1
+
+- Interferências de concordância, contato e envelope de montagem passam a ser avisos. Quando os dados permitem, o app calcula e libera Word e JSON, preservando os esforços e as dimensões nominais. Entradas inválidas, furos sem ligamento e limites resistentes/normativos do modelo continuam tratados separadamente.
+- O complemento até as faces internas das mesas da viga de apoio voltou à single plate viga–viga. Ajuste largura, alívio de canto e filete às mesas. O complemento e as soldas adicionais aparecem no desenho e na memória, sem acrescentar verificações nem aumentar resistências: usa-se a chapa retangular nominal de altura hₚ e sua solda à alma. Sua estabilidade e a redistribuição de esforços estão fora desse cálculo, registradas nas premissas finais.
+- O enrijecedor oposto não faz parte desta atualização. O complemento não está disponível na ligação à mesa de coluna.
+- `examples/Projeto_usuario_W150_W250.json` reproduz o arquivo recebido, sem alterar entradas. Os novos Word `Teste_usuario_W150_W250.docx` e `Teste_usuario_com_complemento.docx` mostram o cálculo com avisos. O segundo é uma variante ilustrativa com largura do complemento de 45 mm. Ambos indicam as falhas calculadas; retirar o bloqueio de montagem não transforma esses resultados em aprovação.
+- Os sete Word anteriores são exemplos da versão 0.7.0, preservados. Os relatórios gerados pelo app atualizado levam a versão 0.7.1.
+
+## Recursos da versão 0.7
 
 - O resultado de atendimento passou a ser **ATENDE ÀS VERIFICAÇÕES REALIZADAS**. As premissas e exclusões ficam no final da tela e no final do Word. Falhas resistentes, geometrias inválidas e condições reais fora do domínio continuam sendo indicadas.
 - As end plates verificam parafusos sob tração, cisalhamento e interação elíptica; contato nos furos; blocos da chapa; soldas e metal-base; alma da viga; mesa e alma da coluna. A engastada inclui o painel da coluna sob as premissas declaradas.
@@ -62,7 +70,7 @@ A coluna é contínua, sem extremidade ou emenda próxima; não há outra viga o
 
 ## Exemplos e documentação
 
-`examples/` contém projetos JSON, desenhos SVG e sete memórias Word atualizadas. Os três exemplos de end plate usam W410×38,8 chegando à mesa de CS600×281. Os esforços são exemplos de uso, não um dimensionamento aprovado para uma obra.
+`examples/` contém projetos JSON, desenhos SVG, as sete memórias da versão 0.7 e dois novos relatórios dos ajustes 0.7.1. Os três exemplos de end plate usam W410×38,8 chegando à mesa de CS600×281. Os esforços são exemplos de uso, não um dimensionamento aprovado para uma obra.
 
 - `docs/END_PLATES_METODOLOGIA.md`: equações, hipóteses, limites e fontes das novas famílias.
 - `docs/registro_end_plates.json`: resultados numéricos reproduzíveis dos exemplos.

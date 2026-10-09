@@ -133,7 +133,7 @@ def render():
     if st.session_state.get('dc_report',('','',b''))[0]!=digest:st.session_state.pop('dc_report',None)
     with right:
         if r.status in ('GEOMETRIA INVÁLIDA','NÃO ATENDE'):st.error(r.status)
-        elif any(i.severity=='pending' for i in r.issues):st.warning(r.status)
+        elif any(i.severity in ('pending','interference') for i in r.issues):st.warning(r.status)
         else:st.success(r.status)
         if r.governing:
             a,b=st.columns(2)
@@ -144,9 +144,9 @@ def render():
         if can_draw:
             st.image(image_bytes(c),width='stretch')
         for issue in r.issues:
-            if issue.text==ASSEMBLY_NOTE:continue
+            if issue.severity=='excluded':continue
             if issue.severity=='error':st.error(issue.text)
-            elif issue.severity=='pending':st.warning(issue.text)
+            elif issue.severity in ('pending','interference'):st.warning(issue.text)
             else:st.caption(issue.text)
         if r.minimum_factor>1:
             st.info('Além da entrada, o app confere a resultante mínima resistente de 45 kN, mantendo a direção N/V. Fator da conferência mínima: '+number(r.minimum_factor,3)+'. Não é nova majoração das ações.')
@@ -181,4 +181,6 @@ def render():
     st.subheader('Premissas adotadas')
     st.write('Modelo plano, contenção eficaz da viga e juntas internas dos perfis soldados com penetração total. Análise global dos membros, fadiga, atrito e ações cíclicas permanecem fora do modelo local.')
     st.write(ASSEMBLY_NOTE)
+    for issue in r.issues:
+        if issue.severity=='excluded' and issue.text!=ASSEMBLY_NOTE:st.write(issue.text)
     st.caption(BRAND)
