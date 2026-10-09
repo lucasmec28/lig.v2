@@ -65,9 +65,7 @@ def test_more_compression_increases_contact_without_reducing_bolt_tension():
 ])
 def test_invalid_pinned_data_never_produces_approval(change):
     r=evaluate(replace(PIN,**change))
-    if change=={'overhang':2}:
-        assert r.checks and r.status=='CÁLCULO ATENDE · CONFERIR INTERFERÊNCIAS'
-    else:assert r.status=='GEOMETRIA INVÁLIDA' and not r.checks
+    assert r.status=='GEOMETRIA INVÁLIDA' and not r.checks
 
 
 def test_thin_moment_plate_fails_even_if_some_strength_checks_pass():

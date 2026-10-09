@@ -120,13 +120,12 @@ def render(kind):
     r=evaluate(c);encoded=json.dumps(c.to_dict(),ensure_ascii=False,indent=2,allow_nan=False);digest=hashlib.sha256(encoded.encode()).hexdigest()
     with right:
         if r.status in ('GEOMETRIA INVÁLIDA','NÃO ATENDE'):st.error(r.status)
-        elif any(i.severity in ('pending','interference') for i in r.issues):st.warning(r.status)
+        elif any(i.severity=='pending' for i in r.issues):st.warning(r.status)
         else:st.success(r.status)
         st.image(image_bytes(c),width='stretch')
         for issue in r.issues:
-            if issue.severity=='excluded':continue
             if issue.severity=='error':st.error(issue.text)
-            elif issue.severity in ('pending','interference'):st.warning(issue.text)
+            elif issue.severity=='pending':st.warning(issue.text)
         if r.checks:
             a=r.geometry['actions'];x,y,z=st.columns(3)
             x.metric('Maior índice',number(max(row.ratio for row in r.checks),3))
@@ -154,6 +153,4 @@ def render(kind):
             for row in r.checks:st.markdown('**'+row.name+'**');st.write(row.equation);st.write(row.substitution);st.caption(row.variables+' '+row.reference)
     st.divider();st.subheader('Premissas adotadas')
     for note in c.assumptions:st.write(note)
-    for issue in r.issues:
-        if issue.severity=='excluded':st.write(issue.text)
     st.caption(BRAND);st.link_button('Contato no LinkedIn',LINK)

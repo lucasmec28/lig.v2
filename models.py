@@ -5,7 +5,7 @@ import json
 import math
 
 KGF = 9.80665
-VERSION = "0.6.0"
+VERSION = "0.7.0"
 SUPPORT_WEB_EXCLUSION = "Não é verificada a interação fora do plano da alma da viga de apoio sob N+V ou N excêntrico."
 
 
@@ -203,7 +203,7 @@ class Check:
 
     @property
     def category(self):
-        return "Condição do método" if self.id in ('support_punch','ductility','weld_development','full_compactness','opposite_compactness') else "Resistência"
+        return "Condição do método" if self.id in ('support_punch','ductility','weld_development','full_compactness','opposite_compactness','ep_plate_rigidity','ep_column_rigidity','ep_plate_prying','ep_column_prying','ep_rotation','ep_ductility','ep_compact_flange','ep_compact_web') else "Resistência"
 
     @property
     def ratio(self):
@@ -238,9 +238,9 @@ class Result:
     def status(self):
         if any(x.severity=="error" for x in self.issues):return "GEOMETRIA INVÁLIDA"
         if any(not c.passed for c in self.checks):return "NÃO ATENDE"
-        if any(x.severity=="pending" for x in self.issues):return "VERIFICAÇÃO INCOMPLETA"
-        if any(x.severity=="excluded" for x in self.issues):return "ATENDE ÀS VERIFICAÇÕES REALIZADAS"
-        return "ATENDE AO ESCOPO VERIFICADO"
+        if any(x.severity=="pending" for x in self.issues):return "REVISAR CONDIÇÕES DE APLICAÇÃO"
+        if not self.checks:return "SEM VERIFICAÇÕES DE RESISTÊNCIA"
+        return "ATENDE ÀS VERIFICAÇÕES REALIZADAS"
 
     @property
     def governing(self):

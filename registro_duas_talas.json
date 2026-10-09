@@ -4,7 +4,7 @@
   "casos": [
     {
       "nome": "W360 → HP250 · tração",
-      "status": "VERIFICAÇÃO INCOMPLETA",
+      "status": "ATENDE ÀS VERIFICAÇÕES REALIZADAS",
       "fator_minimo": 4.024922359499621,
       "geometria": {
         "hp": 220.0,
@@ -443,7 +443,7 @@
     },
     {
       "nome": "W360 → HP250 · compressão",
-      "status": "VERIFICAÇÃO INCOMPLETA",
+      "status": "ATENDE ÀS VERIFICAÇÕES REALIZADAS",
       "fator_minimo": 4.024922359499621,
       "geometria": {
         "hp": 220.0,

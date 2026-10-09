@@ -179,8 +179,6 @@ def create_report(c,r,detailed=False):
     p=doc.add_paragraph();p.add_run(r.status).bold=True
     if r.governing:
         p.add_run(f' · índice resistente máximo {number(r.governing.ratio,3)} · {r.governing.name}')
-    for issue in r.issues:
-        if issue.severity=='excluded':doc.add_paragraph('Nota: '+issue.text)
     pending=[i for i in r.issues if i.severity in ('pending','error')]
     if any(not x.passed for x in r.checks):
         doc.add_paragraph('A ligação não atende às verificações ou requisitos do método indicados no quadro resumo. Revisar o detalhe e conferir as pendências de escopo.')
@@ -274,6 +272,10 @@ def create_report(c,r,detailed=False):
         doc.add_paragraph(x.variables+' Referência: '+x.reference)
         for paragraph in doc.paragraphs[start:-1]:
             paragraph.paragraph_format.keep_with_next=True
+    doc.add_paragraph('Premissas adotadas',style='Heading 1')
+    doc.add_paragraph('Modelo plano, contenção eficaz da viga e juntas internas mesa–alma dos perfis soldados com penetração total e metal de adição compatível. Deslocamento lateral relativo entre as mesas da coluna impedido por hipótese. Não se incluem a análise global da estrutura, atrito, fadiga, vibração ou ações cíclicas.')
+    for issue in r.issues:
+        if issue.severity=='excluded':doc.add_paragraph(issue.text)
     p=s.footer.paragraphs[0];p.paragraph_format.space_after=Pt(0)
     r0=p.add_run(BRAND+' ');r0.font.size=Pt(7)
     hyperlink(p,'LinkedIn de Lucas Oliveira',LINK)

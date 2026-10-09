@@ -182,7 +182,7 @@ def geometry(c):
     if min(c.fin_t,c.beam.tw)>c.db/2+1.6 or c.cover_t>c.db/2+1.6:add('pending','Espessuras fora do limite geométrico conservador de flexibilidade; avaliar rotação da emenda.','Complemento AISC, Parte 10; limite de implementação')
     if not c.norm_minimum:add('pending','Mínimo normativo de 45 kN desativado: modo de comparação.',NBR+', 6.1.5.2')
     if c.V==0 and c.N==0:add('pending','Informe esforços não nulos; a direção do mínimo de 45 kN não está definida.')
-    add('pending',ASSEMBLY_NOTE,'Limite do modelo; não equivale a aprovação integral do nó')
+    add('excluded',ASSEMBLY_NOTE,'Premissas adotadas e abrangência do modelo')
     add('info','Quatro horizontais: dois níveis, com uma chapa de cada lado da alma da coluna. A dupla oposta não aumenta automaticamente as resistências calculadas.','Modelo do detalhe')
     return issues,dict(hp=c.hp,cover_length=c.cover_length,fin_length=c.fin_length,pin_x=c.pin_x,group_e=c.group_e,shim_each=c.shim_each)
 

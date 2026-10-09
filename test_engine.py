@@ -69,7 +69,7 @@ def test_user_case_reports_only_performed_checks_with_explicit_exclusion():
 
 def test_compression_never_reinterpreted_as_tension(referencia):
     r=evaluate(replace(referencia,N=-2000))
-    assert r.status=='VERIFICAÇÃO INCOMPLETA'
+    assert r.status=='REVISAR CONDIÇÕES DE APLICAÇÃO'
     assert not r.checks
 
 
@@ -82,7 +82,7 @@ def test_cope_pure_shear_with_fixed_restraint_is_in_scope():
     c=replace(next(iter(presets().values())),gap=10,a=75,cope='top',cope_length=80,cope_top=25,N=0)
     r=evaluate(c)
     assert not any(i.severity=='error' for i in r.issues)
-    assert r.status=='ATENDE AO ESCOPO VERIFICADO'
+    assert r.status=='ATENDE ÀS VERIFICAÇÕES REALIZADAS'
     assert r.geometry['e']==75
 
 
@@ -124,7 +124,7 @@ def test_weld_and_actual_support_thickness():
 
 
 def test_zero_load_is_not_approved(referencia):
-    assert evaluate(replace(referencia,V=0,N=0)).status=='VERIFICAÇÃO INCOMPLETA'
+    assert evaluate(replace(referencia,V=0,N=0)).status=='REVISAR CONDIÇÕES DE APLICAÇÃO'
 
 
 def test_minimum_deactivation_is_explicit(referencia):

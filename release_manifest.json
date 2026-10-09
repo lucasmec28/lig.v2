@@ -1,16 +1,21 @@
 {
-  "versao": "0.6.0",
-  "testes_software": 147,
-  "testes_single_plate_preservados": 113,
-  "testes_nova_ligacao": 34,
-  "comparacoes_componentes_single_plate": 13,
-  "verificacoes_duas_talas": 30,
-  "paginas_memorias_duas_talas": {
-    "tracao": 6,
-    "compressao": 6
+  "versao": "0.7.0",
+  "data": "2026-10-09",
+  "testes_software": 175,
+  "testes_anteriores": 147,
+  "testes_end_plates": 28,
+  "revisao_visual": "Sete memórias Word renderizadas; todas as 36 páginas inspecionadas. Exemplos das famílias anteriores regenerados com a apresentação e premissas da versão 0.7.",
+  "paginas_memorias": {
+    "end_plate_rotulada": 5,
+    "end_plate_engastada_duas_extensoes": 5,
+    "end_plate_engastada_acima": 5,
+    "duas_talas_tracao": 6,
+    "duas_talas_compressao": 6,
+    "single_plate_viga_viga": 4,
+    "single_plate_viga_coluna": 5
   },
-  "revisao_visual": "Todas as 12 páginas dos dois exemplos novos renderizadas e inspecionadas. Exemplos Word v05 preservados como históricos.",
-  "limite": "Modelo por componentes. Estabilidade acoplada, função de contenção dos horizontais e capacidade de rotação não validadas para o novo nó.",
+  "escopo": "Modelos locais em duas dimensões. End plate engastada 4E no domínio do DG39; rigidez adotada pelo procedimento usual de detalhamento e NBR 6.1.2.3, sem curva momento-rotação calculada. Premissas e limites específicos registrados no aplicativo, nas memórias e na metodologia.",
+  "validacao": "Testes de software, regressão, conferências de equações e comparação de componente com o exemplo 5.3-1 do DG39; não constitui validação experimental do conjunto.",
   "arquivos": [
     {
       "arquivo": ".streamlit/config.toml",
@@ -19,13 +24,13 @@
     },
     {
       "arquivo": "README.md",
-      "bytes": 7093,
-      "sha256": "66b93dfa8a1d84b3bdbf18ab23d7b0c5cd5ec11b33442b92bd8c8c28f3ee0423"
+      "bytes": 6275,
+      "sha256": "4be5b5251d1f3e4e6adb3171381c7dccf4b2ade622e99156e72cd289069621b8"
     },
     {
       "arquivo": "app.py",
-      "bytes": 21195,
-      "sha256": "b8493b9f09eb8f821cf6525bb1f587ea13de4512065e5e6cfb377e4f3b7972bb"
+      "bytes": 21772,
+      "sha256": "02bfc33114a4de0875d5aabbb984be1fd8f7fd7e08dcfba8f8a574adfa4c7373"
     },
     {
       "arquivo": "data/profiles.json",
@@ -39,8 +44,13 @@
     },
     {
       "arquivo": "docs/DUAS_TALAS_METODOLOGIA.md",
-      "bytes": 8318,
-      "sha256": "01c52869815096bf4a6090ed9f53fbd90c952b14275ce643da982128945b978f"
+      "bytes": 8421,
+      "sha256": "27743db9c4a55669671ba430d6bea921b9734fc4412c7000788e3f8e3028e589"
+    },
+    {
+      "arquivo": "docs/END_PLATES_METODOLOGIA.md",
+      "bytes": 6605,
+      "sha256": "7549a2023e6a6d6e6bea51b0af5cebdc0eff2acfeebfdb920cbea8192ba3294a"
     },
     {
       "arquivo": "docs/METODOLOGIA.md",
@@ -74,8 +84,13 @@
     },
     {
       "arquivo": "docs/registro_duas_talas.json",
-      "bytes": 49724,
-      "sha256": "7e0873353a785abbfc6cb18557262b74f189f639722e8d84bb6073cb03472c9d"
+      "bytes": 49748,
+      "sha256": "cb65f9ab5c5c529de17388c05a82ebfa57e685fb379c328c874f072541e43540"
+    },
+    {
+      "arquivo": "docs/registro_end_plates.json",
+      "bytes": 1919,
+      "sha256": "5e98dbd9bc3f1081f02fa81c02f6eb160d33616dd4ad743776a84042fb08fb7b"
     },
     {
       "arquivo": "docs/registro_validacao.json",
@@ -108,14 +123,69 @@
       "sha256": "5ed307055ef66db8a5e4e10a32f17c80e02f184893bc1cafcf1c52643f5225d4"
     },
     {
+      "arquivo": "examples/End_plate_engastada_acima.docx",
+      "bytes": 126533,
+      "sha256": "2e3f44b0cdc146ece67312ec86e6d0f03c42a134dfcd1c5438afa754c3f9aa17"
+    },
+    {
+      "arquivo": "examples/End_plate_engastada_acima.json",
+      "bytes": 4211,
+      "sha256": "dee5cfec5c2e6a998b71380b77890171b5a63b183c9a6754f0bd6b08df2de9bb"
+    },
+    {
+      "arquivo": "examples/End_plate_engastada_acima.svg",
+      "bytes": 24258,
+      "sha256": "99ff904495264e000cbfcc92618be0a1c2074e3bfb458142df3093446c51078b"
+    },
+    {
+      "arquivo": "examples/End_plate_engastada_duas_extensoes.docx",
+      "bytes": 128314,
+      "sha256": "aadc13e906840ef03fc5e00d32884c111b2371c3867d57e51c396575bb3f0349"
+    },
+    {
+      "arquivo": "examples/End_plate_engastada_duas_extensoes.json",
+      "bytes": 4221,
+      "sha256": "84e7ff0d4f390c19b81630bbb9afb516b789c3a2fc30a368836904d69cd4701f"
+    },
+    {
+      "arquivo": "examples/End_plate_engastada_duas_extensoes.svg",
+      "bytes": 27276,
+      "sha256": "d88df5e5be7c914d735f10c0fc8befdea5c723cf3afb204d446c8aff049fcf5a"
+    },
+    {
+      "arquivo": "examples/End_plate_rotulada.docx",
+      "bytes": 121693,
+      "sha256": "6c2f41a17b23656ca1ad71895cc87a1cac9b1bb47c6eec75b997da5d666eedcc"
+    },
+    {
+      "arquivo": "examples/End_plate_rotulada.json",
+      "bytes": 3686,
+      "sha256": "59ae35df7785a1f1ada90c7286c31aaa1a1f198b3f82f55da1798bad3bad63ff"
+    },
+    {
+      "arquivo": "examples/End_plate_rotulada.svg",
+      "bytes": 24479,
+      "sha256": "c0a7501edfc4c6f67541fe4e4db61058dc3da4d0b73b1f0d7b7acb8affa77c01"
+    },
+    {
       "arquivo": "examples/Exemplo_Duas_talas_compressao.docx",
-      "bytes": 184564,
-      "sha256": "e3a247df3ebf8ebbfdb940fb0a98808645da1146e4c93d0ebf765248fe41ab79"
+      "bytes": 184539,
+      "sha256": "131fb28b07d26c4521b3c4cad2726ed5295027246eaecc66bb6be562ad79597b"
     },
     {
       "arquivo": "examples/Exemplo_Duas_talas_tracao.docx",
-      "bytes": 184566,
-      "sha256": "180c40a85a2079f028121960e197f0e9fa9b1038f512c57935e9c0102c215184"
+      "bytes": 184540,
+      "sha256": "ca4c32e9fc4ff15fc8ec0e1e941c1068f2d5509da4d005dfcdfbfff99d26730d"
+    },
+    {
+      "arquivo": "examples/Exemplo_single_plate_viga_coluna.docx",
+      "bytes": 132467,
+      "sha256": "43fdc65fbb544617bd280acd9c710447cf9b70cf176b0c66e14f9808935451e9"
+    },
+    {
+      "arquivo": "examples/Exemplo_single_plate_viga_viga.docx",
+      "bytes": 130471,
+      "sha256": "c6ec17413117150dc414c2ac8e17760584e963dd921a49efca0d6eb37cacc05d"
     },
     {
       "arquivo": "examples/Exemplo_viga_coluna.json",
@@ -128,11 +198,6 @@
       "sha256": "76cb2198ea3fdc2e8a3add9ff8f2923c2ddb38c0bc1627a257808a64739559d0"
     },
     {
-      "arquivo": "examples/Exemplo_viga_coluna_v05.docx",
-      "bytes": 132492,
-      "sha256": "87bf45ecd9dbc6eef7eed82a6bb86a25f68113b19997f60078efe520ef1d7d82"
-    },
-    {
       "arquivo": "examples/Exemplo_viga_viga.json",
       "bytes": 2427,
       "sha256": "79b68969052b848ea49b7373416ad3c1ded937de084c2c8bb195b325d0a43f48"
@@ -141,11 +206,6 @@
       "arquivo": "examples/Exemplo_viga_viga.svg",
       "bytes": 58962,
       "sha256": "9fec1dc1b5fa49b90ca87931d95c0394109af4fca8de683e91c34feb4863f2dc"
-    },
-    {
-      "arquivo": "examples/Exemplo_viga_viga_v05.docx",
-      "bytes": 130565,
-      "sha256": "b34601258659f48df4854f9f90227e0260ab06d8325741f36f33c304abaa34b0"
     },
     {
       "arquivo": "examples/Referencia_didatica.json",
@@ -189,8 +249,8 @@
     },
     {
       "arquivo": "lro/double_cover.py",
-      "bytes": 22227,
-      "sha256": "06e0b75d4bc2cdc31fd14ca41f757be81810c02f08a1a1f8bd054c6acbedc110"
+      "bytes": 22210,
+      "sha256": "8d0b80a9e1288ba0645710b3d57fe1198c473896beca74b6702799568d07d929"
     },
     {
       "arquivo": "lro/double_cover_drawing.py",
@@ -199,18 +259,38 @@
     },
     {
       "arquivo": "lro/double_cover_report.py",
-      "bytes": 14040,
-      "sha256": "f52394b8eb543748dc2d6753c07f6271574fd80dec32ed4d6bcf435c29fda018"
+      "bytes": 14316,
+      "sha256": "fe67d8c268d3dc9302aa8ae79e9232759eb83c21c52d31f9ce9512e7f5d8e71e"
     },
     {
       "arquivo": "lro/double_cover_ui.py",
-      "bytes": 12744,
-      "sha256": "e9200b359607642e956dcf1bd51e533ecc7088fdeff4987a46d531279af66eac"
+      "bytes": 13089,
+      "sha256": "49560bf649298994832c10ccd3ed0941c3e278d6f9f56c5130fcce4b6c1f08a9"
     },
     {
       "arquivo": "lro/drawing.py",
       "bytes": 7214,
       "sha256": "aa4126ffa6c03b35bb66a5e3173c60105138e200618844304cb867e13e6c8f81"
+    },
+    {
+      "arquivo": "lro/end_plate.py",
+      "bytes": 27148,
+      "sha256": "994f1091774d5972200fee2d5d1247362c4b3201d3a1f9e644be7607f4e5bf6a"
+    },
+    {
+      "arquivo": "lro/end_plate_drawing.py",
+      "bytes": 4732,
+      "sha256": "a57ffc05d06efcc2810f00f7f3c0c17281e29dd56d30fbfd0170d0896fed57bd"
+    },
+    {
+      "arquivo": "lro/end_plate_report.py",
+      "bytes": 10223,
+      "sha256": "4f48ff9fe51a2520455c2732b0c4cd1dd1ff7208ec7904cc714bce1e73d57d17"
+    },
+    {
+      "arquivo": "lro/end_plate_ui.py",
+      "bytes": 11185,
+      "sha256": "30350588e2b6e403fcb93806fa32de2abd7951c2de124775f7d7a6a0c0c07779"
     },
     {
       "arquivo": "lro/engine.py",
@@ -229,13 +309,13 @@
     },
     {
       "arquivo": "lro/models.py",
-      "bytes": 9126,
-      "sha256": "8378a7b075a23dfdecb37827f2f05100f258e1dd7b55cce780072c75d14e510f"
+      "bytes": 9254,
+      "sha256": "741047b7def2895389459d972d13ccf41ce61713290552e52d3ac825b3bb931c"
     },
     {
       "arquivo": "lro/report.py",
-      "bytes": 25290,
-      "sha256": "1d10d7cefa1a6dce76cdb949507fb03ffc3bd87ef4670e2e3e0a5d394e68f224"
+      "bytes": 25691,
+      "sha256": "5d70948129310a4ce399e0c5f2210fcfced42cc193fa942c5d93f27ae9cf8acf"
     },
     {
       "arquivo": "lro/support_checks.py",
@@ -254,43 +334,53 @@
     },
     {
       "arquivo": "tests/test_app.py",
-      "bytes": 4184,
-      "sha256": "2f1422a90d1a7f25c23e9401622cccb0670a1b1e83db82a1806205b4a1fe37cf"
+      "bytes": 4194,
+      "sha256": "7282f989f25c3a61dcf0fe4e3782c28afdd6133bfa983a13791b5ef18b002d0c"
     },
     {
       "arquivo": "tests/test_double_cover.py",
-      "bytes": 7241,
-      "sha256": "4445e78a6f82fcb3ec097b4d008effea1d7a6939731044a944d98c7049c73615"
+      "bytes": 7276,
+      "sha256": "7bb4c47069936e9c7df9e9853dc9cc98353c81daeb2f4578392a6d353d529ee8"
     },
     {
       "arquivo": "tests/test_double_cover_app.py",
-      "bytes": 2309,
-      "sha256": "7939dc96db632e0d900ffd708f37e0b8e9f6d6c0650911048796fe94f07145b3"
+      "bytes": 2321,
+      "sha256": "a3baa018ffe21bba2c51504da3b129998cf658eed871e6897cecdaa700f95a3f"
+    },
+    {
+      "arquivo": "tests/test_end_plate.py",
+      "bytes": 4558,
+      "sha256": "6f3641f39615ba9709ae0868a72344abe32c0ac4986759965058555e5dd3dd8d"
+    },
+    {
+      "arquivo": "tests/test_end_plate_app.py",
+      "bytes": 1740,
+      "sha256": "5dc03a86df630d3b66492c64e2d426ea883551ff0caa09878be06833f86ecbac"
     },
     {
       "arquivo": "tests/test_engine.py",
-      "bytes": 11641,
-      "sha256": "8fb7c9b5ad9afa6037bf908849a71093aac9a0bd6dd715baf321476682c86bc0"
+      "bytes": 11670,
+      "sha256": "a151e449b518e2fc9dd23e112b4bc770149f2d3a5856b20c2464f9888c3f336d"
     },
     {
       "arquivo": "tests/test_v03.py",
-      "bytes": 5860,
-      "sha256": "00f85377da8b6e042d5c1cf81e3be79d23bf2fc77923ebde449bf54f5a81b15d"
+      "bytes": 5887,
+      "sha256": "b227184ddc5de232f4f9eb5a2f819e36c00728c0d97bd8cc61e738f41b94a6fe"
     },
     {
       "arquivo": "tests/test_v04.py",
-      "bytes": 4800,
-      "sha256": "88fb0d5bdd5de9f6184069d2b419aad61a712c812bda77d4f4f3bce1ed13bbf8"
+      "bytes": 4819,
+      "sha256": "e53197e85311790b50a4e93e6535379360ff7df917370c93b6ffb770b3532b7d"
     },
     {
       "arquivo": "tests/test_v05.py",
-      "bytes": 4699,
-      "sha256": "fe0e17b4eb3791508662d3409f134b66f534336554adaa6a744f5e6ab7cfac3f"
+      "bytes": 4708,
+      "sha256": "a014ba3a3f0322433d4fa3ce04f4cf37b813e848e1e7b9746b7318db1c767ead"
     },
     {
       "arquivo": "tests/test_v051.py",
-      "bytes": 2688,
-      "sha256": "0af3c5bf03473ca3315337f617cd4d9877d9c2a054ee8fb75c6643885bd59356"
+      "bytes": 2716,
+      "sha256": "149bcfb09da5c4bea474f651433e9c3b2763441be071a0e8c0307d828d559895"
     }
   ]
 }

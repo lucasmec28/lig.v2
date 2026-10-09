@@ -13,7 +13,7 @@ def open_app():
 
 def test_new_type_export_and_invalidate_old_report():
     at=open_app()
-    assert any(x.value=='VERIFICAÇÃO INCOMPLETA' for x in at.warning)
+    assert any(x.value=='ATENDE ÀS VERIFICAÇÕES REALIZADAS' for x in at.success)
     assert not at.error
     assert not any('momento' in x.label.lower() for x in at.number_input)
     at.button[0] # widgets present

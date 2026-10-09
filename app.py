@@ -21,10 +21,15 @@ st.markdown('''<style>
  div[data-testid="stVerticalBlockBorderWrapper"] {border-radius:12px}
  </style>''',unsafe_allow_html=True)
 
-family=st.sidebar.selectbox('Tipo de ligação',['Single plate','Alma de coluna · duas talas'],key='connection_family')
+family=st.sidebar.selectbox('Tipo de ligação',['Single plate','Alma de coluna · duas talas','End plate · rotulada','End plate · engastada'],key='connection_family')
 if family=='Alma de coluna · duas talas':
     from lro.double_cover_ui import render
     render()
+    st.stop()
+
+if family.startswith('End plate'):
+    from lro.end_plate_ui import render
+    render('pinned' if family.endswith('rotulada') else 'moment')
     st.stop()
 
 P=profiles();PRESETS=presets()
@@ -204,7 +209,7 @@ with right:
             st.image(drawing_cached(payload,'png'),width='stretch')
         if r.status=='GEOMETRIA INVÁLIDA':st.error(r.status)
         elif r.status=='NÃO ATENDE':st.error(r.status+' · revisar os itens com índice > 1')
-        elif r.status=='VERIFICAÇÃO INCOMPLETA':st.warning(r.status)
+        elif any(i.severity=='pending' for i in r.issues):st.warning(r.status)
         else:st.success(r.status)
         ms=st.columns(3)
         ms[0].metric('Aba parafusada (mm)' if c.full_depth else 'Chapa (mm)',f'{c.width:g} × {c.hp:g}',f't = {c.tp:.3f} mm',delta_color='off')
@@ -215,9 +220,7 @@ with right:
         if any(x.id=='support_punch' and not x.passed for x in r.checks):
             st.info('O requisito de hierarquia contra punção é uma condição do método: compara a espessura da chapa com um limite, não esforço com resistência. Seu descumprimento exige revisar o detalhe ou fazer uma verificação específica do apoio.')
         for issue in r.issues:
-            if issue.severity=='excluded':
-                st.caption('Nota: '+issue.text)
-                continue
+            if issue.severity=='excluded':continue
             f=st.error if issue.severity=='error' else st.warning if issue.severity=='pending' else st.info
             f((issue.origin_label+': ' if issue.severity=='pending' else '')+issue.text+'  ['+issue.reference+']')
         if c.full_depth:
@@ -261,11 +264,15 @@ with tabs[3]:
 
 **Chapa/enrijecedores entre mesas:** retirados da seleção. Esta variante não é avaliada; projetos antigos dessa variante não geram resultados nesta versão.
 
-**Cobertura atual:** recortes dentro do domínio, ductilidade, solda chapa–apoio e metal-base das juntas de penetração total do perfil de pilar são calculados. No pilar, o momento é transportado à alma e suas zonas de tração/compressão são verificadas. A alma sob tração direta centrada, sem cortante, recebe cálculo por linhas de plastificação e punção, dentro de seu domínio. A interação fora do plano sob N+V ou N excêntrico é excluída do cálculo e indicada por uma nota junto ao resultado. A contenção eficaz da viga apoiada é hipótese fixa. Não se aplicam cortante horizontal nem momento no eixo de menor inércia. O apoio conserva suas próprias verificações locais; a estabilidade global permanece no projeto estrutural e o impedimento de deslocamento relativo das mesas do pilar é uma premissa registrada na memória.
+**Cobertura atual:** recortes dentro do domínio, ductilidade, solda chapa–apoio e metal-base das juntas de penetração total do perfil de pilar são calculados. No pilar, o momento é transportado à alma e suas zonas de tração/compressão são verificadas. A alma sob tração direta centrada, sem cortante, recebe cálculo por linhas de plastificação e punção, dentro de seu domínio. A interação fora do plano sob N+V ou N excêntrico é excluída do cálculo e indicada nas premissas ao final da página. A contenção eficaz da viga apoiada é hipótese fixa. Não se aplicam cortante horizontal nem momento no eixo de menor inércia. O apoio conserva suas próprias verificações locais; a estabilidade global permanece no projeto estrutural e o impedimento de deslocamento relativo das mesas do pilar é uma premissa registrada na memória.
 
-**Prioridade de desenvolvimento:** concluir e validar as pendências das duas ligações antes de ampliar para cantoneiras. A revisão consolidada acompanha o pacote em docs/REVISAO_TECNICA.md.
+**Outras famílias:** duas talas e end plates estão disponíveis no seletor lateral, com domínio e premissas próprios. A revisão das single plates acompanha o pacote em docs/REVISAO_TECNICA.md.
 
 O P902-23W contém tabelas complementares; suas tabelas 10-A/10-B são para paredes de perfis tubulares e não são aplicadas às almas dos perfis I desta versão.''')
 st.divider()
+st.subheader('Premissas adotadas')
+st.write('Modelo plano; viga com contenção eficaz; juntas internas mesa–alma dos perfis soldados com penetração total e metal de adição compatível. A análise global dos membros e do contraventamento pertence ao projeto da estrutura. Não se incluem atrito, fadiga, vibração ou ações cíclicas.')
+for issue in r.issues:
+    if issue.severity=='excluded':st.write(issue.text)
 st.caption(BRAND)
 st.link_button('Contato no LinkedIn',LINK)

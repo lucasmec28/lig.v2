@@ -61,7 +61,6 @@ def create_report(c,r,detailed=False):
     doc.add_paragraph(c.beam.name+' → '+c.support.name)
     p=doc.add_paragraph();p.add_run(r.status).bold=True
     p.add_run(' | Maior índice calculado: '+number(r.governing.ratio,3))
-    doc.add_paragraph(ASSEMBLY_NOTE+' Os índices abaixo se referem aos componentes do modelo local e não aprovam esses mecanismos pendentes.')
     doc.add_picture(BytesIO(image_bytes(c)),width=Inches(6.95))
     doc.add_paragraph('As talas são independentes do conjunto soldado: cada grupo de parafusos transmite V e N integrais; cada tala recebe metade. A viga não encosta na coluna ou na nervura. Encontro ortogonal, com as peças centradas na altura da viga.')
     doc.add_paragraph('O desenho acompanha a geometria informada. É ilustrativo e não substitui o detalhamento de fabricação, a definição dos comprimentos dos parafusos ou a especificação de montagem.')
@@ -130,6 +129,9 @@ def create_report(c,r,detailed=False):
     if c.notes:doc.add_paragraph('Observações do projeto: '+c.notes)
     doc.add_paragraph('Referências',style='Heading 1')
     for ref in REFERENCES:doc.add_paragraph(ref)
+    doc.add_paragraph('Premissas adotadas',style='Heading 1')
+    doc.add_paragraph('Modelo plano; contenção eficaz da viga; juntas internas dos perfis soldados de penetração total; ausência de ações fora do plano e de efeitos de fadiga, vibração ou carregamento cíclico.')
+    doc.add_paragraph(ASSEMBLY_NOTE+' A análise global dos membros e a estabilidade fora do plano permanecem no projeto da estrutura.')
     doc.add_paragraph(BRAND)
     p=doc.add_paragraph('LRO Ligações '+VERSION+' · ');hyperlink(p,'LinkedIn — Lucas Oliveira',LINK)
     out=BytesIO();doc.save(out);return out.getvalue()

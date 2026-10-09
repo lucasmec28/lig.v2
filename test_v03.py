@@ -75,7 +75,7 @@ def test_usi350_development_weld_has_reference_not_pending():
 def test_g10_on_column_flange_and_actionable_edge_limit():
     c=replace(next(iter(presets().values())),kind='column_flange',a=75,gap=10,restrained=True)
     r=evaluate(c)
-    assert r.status=='ATENDE AO ESCOPO VERIFICADO'
+    assert r.status=='ATENDE ÀS VERIFICAÇÕES REALIZADAS'
     fail=evaluate(replace(c,a=120,gap=40))
     assert any('a − g = 120 − 40 = 80' in i.text and '78' in i.text for i in fail.issues)
     assert evaluate(replace(c,a=120,gap=10)).status=='GEOMETRIA INVÁLIDA'
@@ -84,7 +84,7 @@ def test_g10_on_column_flange_and_actionable_edge_limit():
 def test_cope_complete_for_pure_shear_and_braced_beam():
     c=replace(next(iter(presets().values())),a=75,gap=10,cope='top',N=0,restrained=True)
     r=evaluate(c)
-    assert r.status=='ATENDE AO ESCOPO VERIFICADO'
+    assert r.status=='ATENDE ÀS VERIFICAÇÕES REALIZADAS'
     assert all(k in checks(c) for k in ('cope_interaction','cope_rupture','cope_block'))
     assert replace(c,restrained=False).restrained is True
     assert evaluate(replace(c,restrained=False)).status==r.status
@@ -93,7 +93,7 @@ def test_cope_complete_for_pure_shear_and_braced_beam():
 
 def test_welded_column_assumes_cjp_and_checks_its_base_metal():
     c=replace(list(presets().values())[-1],support=profiles()['CS 600 x 281'],support_steel='ASTM A36')
-    assert evaluate(c).status=='ATENDE AO ESCOPO VERIFICADO'
+    assert evaluate(c).status=='ATENDE ÀS VERIFICAÇÕES REALIZADAS'
     assert 'support_joint_base' in checks(c)
     assert 'support_joint_weld' not in checks(c)
     assert checks(replace(c,support_joint_weld=6))['support_joint_base'].ratio==checks(c)['support_joint_base'].ratio

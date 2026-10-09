@@ -8,13 +8,13 @@ def test_ui_load_change_and_export():
     at=AppTest.from_file(str(APP),default_timeout=30).run()
     assert not at.exception
     assert any(x.value=='ATENDE ÀS VERIFICAÇÕES REALIZADAS' for x in at.success)
-    assert sum('Não é verificada a interação fora do plano' in x.value for x in at.caption)==1
+    assert sum('Não é verificada a interação fora do plano' in x.value for x in at.markdown)==1
     assert 'support_edge_distance' not in [x.key for x in at.number_input]
     name=next(x for x in at.selectbox(key='example').options if 'CS600' in x)
     at.selectbox(key='example').set_value(name)
     next(x for x in at.button if x.label=='Usar este exemplo').click().run()
     assert not at.exception
-    assert any('ATENDE AO ESCOPO' in x.value for x in at.success)
+    assert any('ATENDE ÀS VERIFICAÇÕES' in x.value for x in at.success)
     next(x for x in at.button if x.label=='Gerar memória Word').click().run()
     assert not at.exception
     initial_report=at.session_state['report']

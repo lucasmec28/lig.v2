@@ -133,8 +133,8 @@ def render():
     if st.session_state.get('dc_report',('','',b''))[0]!=digest:st.session_state.pop('dc_report',None)
     with right:
         if r.status in ('GEOMETRIA INVÁLIDA','NÃO ATENDE'):st.error(r.status)
-        else:st.warning(r.status)
-        st.caption(ASSEMBLY_NOTE)
+        elif any(i.severity=='pending' for i in r.issues):st.warning(r.status)
+        else:st.success(r.status)
         if r.governing:
             a,b=st.columns(2)
             a.metric('Maior índice calculado',number(r.governing.ratio,3))
@@ -177,4 +177,8 @@ def render():
     saved=st.session_state.get('dc_report')
     if saved and saved[0]==digest and saved[1]==detailed:
         st.download_button('Baixar memória de duas talas .docx',saved[2],'Memoria_duas_talas_LRO.docx','application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    st.divider()
+    st.subheader('Premissas adotadas')
+    st.write('Modelo plano, contenção eficaz da viga e juntas internas dos perfis soldados com penetração total. Análise global dos membros, fadiga, atrito e ações cíclicas permanecem fora do modelo local.')
+    st.write(ASSEMBLY_NOTE)
     st.caption(BRAND)
