@@ -1,113 +1,57 @@
-# LRO Ligações — versão 0.3.0
+# LRO Ligações — versão 0.5.1
 
 Desenvolvido por LRO Soluções de engenharia LTDA.
 
-[Contato: Lucas Oliveira no LinkedIn](https://www.linkedin.com/in/lucas-oliveira-722723149/?isSelfProfile=true)
+[LinkedIn — Lucas Oliveira](https://www.linkedin.com/in/lucas-oliveira-722723149/?isSelfProfile=true)
 
-Aplicativo para **pré-verificação de ligações single plate** em perfis I. A versão possui limites técnicos explícitos; consulte `docs/METODOLOGIA.md` antes de utilizar seus resultados em projeto.
+Single plate **retangular**, em perfis I: viga–viga e viga–mesa de pilar, encontro a 90°. Forças em kgf, momentos em kgf·m, dimensões em mm. Entradas já majoradas; não há nova majoração de ações. O mínimo resistente de 45 kN é verificado separadamente quando aplicável.
 
-## Começar
+## Atualizar e abrir
 
-O pacote contém o aplicativo, entradas de exemplo, relatórios de demonstração para viga–viga e viga–pilar, catálogo de perfis, revisão técnica, metodologia e testes. Não contém os PDFs e as planilhas de terceiros utilizados como referências.
-
-### Usar no computador
-
-Instale Python 3.12. Extraia o ZIP, abra um terminal na pasta que contém `app.py` e execute:
-
-```bash
-python -m venv .venv
-```
-
-Ative o ambiente:
-
-```powershell
-# Windows PowerShell
-.venv\Scripts\Activate.ps1
-```
-
-```bash
-# macOS ou Linux
-source .venv/bin/activate
-```
-
-Instale e inicie:
+1. Pare o aplicativo no terminal com **Ctrl+C**.
+2. Extraia este pacote em uma **pasta nova** e preserve seus projetos JSON.
+3. Abra o terminal na pasta que contém `app.py`. Ative seu ambiente Python 3.12 e execute:
 
 ```bash
 python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-O terminal informa o endereço local para abrir no navegador. Não é necessário Word instalado para gerar o DOCX. O aplicativo funciona sem APIs pagas ou serviços de IA.
+Se ainda não houver ambiente: `python -m venv .venv`; no PowerShell, ative com `.venv\Scripts\Activate.ps1`. Para evitar problemas de política do PowerShell, também é possível executar diretamente `.venv\Scripts\python.exe -m pip install -r requirements.txt` e `.venv\Scripts\python.exe -m streamlit run app.py`.
 
-### Disponibilizar por um link Streamlit
+A atualização é local; este pacote não altera seu app hospedado. Para hospedagem, atualize também `lro/`, `data/` e os demais arquivos do repositório, preservando a estrutura. Não envie `.venv`.
 
-1. Coloque o conteúdo extraído em um repositório GitHub destinado ao aplicativo. `app.py`, `requirements.txt`, `lro/`, `data/` e `.streamlit/` devem permanecer juntos na raiz.
-2. No Streamlit Community Cloud, crie um aplicativo e selecione esse repositório, a branch e o arquivo principal `app.py`.
-3. Nas configurações avançadas, selecione Python 3.12, versão usada na validação deste pacote, se disponível.
-4. Publique e confira o carregamento dos exemplos e a exportação Word no endereço gerado.
+## Decisões desta versão
 
-Instruções oficiais: https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy
+Na revisão 0.5.1, a interação fora do plano da alma do apoio passa de pendência para exclusão explícita, conforme solicitado. A nota não atribui resistência ao mecanismo omitido.
 
-**Esta entrega não altera automaticamente seu site publicado.** Atualize os arquivos do repositório para publicar esta versão. O app não inclui autenticação própria; configure o acesso na hospedagem conforme o uso pretendido.
+- **Contenção eficaz da viga apoiada é fixa**, inclusive na importação de projetos antigos. Não há pergunta na tela nem cálculo de cortante horizontal/momento no eixo de menor inércia. N axial permanece como entrada.
+- A solda da ligação é **single plate → apoio**. A viga apoiada é parafusada à chapa.
+- Os perfis soldados têm juntas internas mesa–alma de **penetração total, com metal de adição compatível**, por hipótese; não se informa filete de fabricação.
+- Para o pilar, admite-se impedido o deslocamento lateral relativo entre as mesas na região da ligação. Essa premissa é registrada e independe da penetração total. A estabilidade global continua no projeto estrutural.
+- **Chapa/enrijecedores entre mesas foram retirados**. Há aviso curto; essa variante não é avaliada nem convertida automaticamente ao abrir arquivos antigos.
+- Geometrias e esforços dos dois testes enviados foram preservados. As hipóteses acima são novas e ficam expressas no JSON e no Word.
 
-## Atualizar a versão anterior
+## O que os exemplos mostram
 
-Pare o Streamlit com Ctrl+C. Extraia esta versão em uma pasta nova; preserve seus projetos JSON. Ative seu ambiente Python, instale `requirements.txt` e execute `python -m streamlit run app.py`. A v0.3 abre projetos JSON das v0.1 e v0.2. Os novos campos recebem valor neutro quando ausentes; a solda mesa–alma não é inventada na importação.
+| Exemplo | Resultado | Maior índice resistente |
+|---|---|---:|
+| W410×38,8 → CS600×281, g=10 mm | Atende ao escopo local e às premissas declaradas | 0,454 |
+| W360×39 → W410×38,8, g=80 mm | Atende às verificações realizadas; interação da alma excluída | 0,669 |
 
-Para atualizar a hospedagem, substitua também as pastas `lro/` e `data/`, preservando a estrutura. Não envie `.venv/` ao GitHub.
+**Nota de escopo:** Não é verificada a interação fora do plano da alma da viga de apoio sob N+V ou N excêntrico. O app e o Word indicam essa exclusão junto ao resultado. O atendimento refere-se somente aos itens calculados. Os cálculos isolados de plastificação e punção sob N, e o campo de distância longitudinal, ficam restritos à tração centrada sem cortante. Outras falhas e pendências continuam sendo sinalizadas.
 
-## Novidades
+O perfil utilizado nos arquivos enviados é **CS 600×281**, não CVS. O catálogo ou a seção personalizada permite escolher outro perfil real; não existe equivalência automática entre essas designações.
 
-- Ductilidade por CIR sob momento puro, pega longa e grupo de uma ou duas colunas de parafusos.
-- Resistência e estabilidade local dos recortes, com suas condições de contenção e domínio.
-- Instabilidade ao corte da alma e solda mesa–alma do pilar soldado quando informada.
-- Formulação geral do desenvolvimento da solda, incluindo USI-CIVIL 350.
-- Folga g de 10 mm como sugestão; aviso de borda explica a − g e sugere ajustar a.
-- Onze comparações numéricas com referências, além dos testes automatizados e exemplos JSON.
+## Arquivos e verificação
 
-**Ainda pendentes:** flexão fora do plano da alma da viga de apoio sob tração; modelo resistente da chapa soldada às mesas e do enrijecedor oposto. A variante entre mesas permanece como pré-detalhamento sem resistência calculada. Consulte `docs/REVISAO_TECNICA.md`.
+`examples/` contém os projetos atuais, desenhos SVG e duas memórias Word compactas. O arquivo `Teste_usuario_v03_original.json` mantém a entrada histórica original para conferir a migração. `docs/REVISAO_TECNICA.md` descreve a revisão; `docs/METODOLOGIA.md` contém os modelos e limites; `docs/registro_validacao.json` registra cada resultado.
 
-## Fluxo de uso
-
-1. Escolha ligação na alma de viga ou na mesa do pilar.
-2. Selecione os perfis e informe cortante e tração já majorados, em kgf.
-3. Ajuste parafusos, chapa, solda e cotas. As vistas proporcionais são atualizadas junto com o cálculo.
-4. Confira os alertas e as abas de verificações e referências.
-5. Gere a memória compacta ou detalhada em Word. Salve também o projeto em JSON para reabrir as mesmas entradas.
-
-A memória compacta apresenta todos os índices no resumo e desenvolve as verificações determinantes por componente. As equações no Word são editáveis. Um relatório gerado deixa de ser oferecido para download quando as entradas são alteradas.
-
-## Exemplos
-
-- **Seu caso W360 → W410:** V = 11 kN e N = 2 kN, preservados como entradas. Inclui conferência independente do mínimo normativo de 45 kN. Resultado condicionado, entre outros pontos, à flexão fora do plano da alma do apoio sob N.
-- **Exemplo de referência adaptado:** exemplo didático W310×21 → W150×22,5(H), V = 45 kN. Chapa, cota a e excentricidade foram alteradas e estão identificadas; não é uma reprodução integral do exemplo original.
-- **Viga na mesa de pilar W:** alternativa laminada para explorar a outra geometria. A indicação do usuário “CVS 600×281” não foi substituída automaticamente: no catálogo fornecido, a designação existente é **CS 600×281**. O perfil definitivo pode ser escolhido ou informado como seção personalizada.
-
-## Estados de resultado
-
-| Estado | Significado |
-|---|---|
-| Geometria inválida | Dados ou interferências impedem o cálculo de resistência. |
-| Não atende | Pelo menos uma verificação implementada excede o limite. Pode também haver pendências. |
-| Verificação incompleta | As verificações calculadas atendem, mas há estados limite ou condições sem confirmação. |
-| Atende ao escopo verificado | As verificações locais implementadas atendem às hipóteses informadas; não equivale à aprovação global da estrutura. |
-
-## Conteúdo técnico e desenvolvimento
-
-- [Metodologia e pendências](docs/METODOLOGIA.md)
-- [Validação e referências](docs/VALIDACAO.md)
-- `docs/fontes.json`: inventário das fontes selecionadas, edições e identificação por hash.
-- `lro/models.py`: unidades, dados e objetos de entrada/saída.
-- `lro/engine.py`: cálculo e regras geométricas independentes da tela.
-- `lro/drawing.py`: desenho derivado da mesma geometria.
-- `lro/report.py`: memória Word derivada dos resultados do motor.
-- `data/profiles.json`: 560 seções catalogadas com indicação da origem.
-
-Para executar os testes:
+**113 testes de software aprovados; 13 comparações pontuais com referências aprovadas.** Não são validação experimental integral do nó. O exemplo didático W310→W150 é mantido sem alteração e passa a ser reprovado pelo novo critério conservador de escoamento localizado no pilar (índice 1,010).
 
 ```bash
 python -m pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
-A próxima família prevista é cantoneira simples e dupla. Antes de ampliar o catálogo de ligações, a prioridade técnica é concluir as pendências dos dois casos de single plate do projeto e ampliar a comparação integral com exemplos resolvidos.
+Projetos dos esquemas 1–3 são aceitos e exportados no esquema 4, com as hipóteses fixas declaradas. Projetos da variante entre mesas são recusados. Em qualquer caso fora do domínio, o app deve ser tratado conforme o estado exibido, e não apenas pelo maior índice.
