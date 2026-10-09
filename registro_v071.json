@@ -1,0 +1,356 @@
+[
+  {
+    "exemplo": "Teste_usuario_W150_W250",
+    "status": "NÃO ATENDE",
+    "verificacoes": 24,
+    "governante": {
+      "id": "bearing_beam",
+      "name": "Contato e rasgamento da alma",
+      "demand": 48483.615014639356,
+      "resistance": 36582.25,
+      "unit": "N",
+      "reference": "ABNT NBR 8800:2024, versão corrigida 2025, 6.3.3.3(a)",
+      "equation": "F_Rd = min(1,2·lc·t·fu; 2,4·db·t·fu) / γa2",
+      "substitution": "lc conservador = 21.269 mm; t = 4.3; fu = 450; Fmax = 48483.62 N",
+      "variables": "lc: menor distância livre possível a bordas ou furos, adotada para qualquer direção da força; t: espessura ligada; fu: ruptura do metal-base.",
+      "case": "Mínimo normativo de 45 kN"
+    },
+    "indices": [
+      {
+        "id": "bolts",
+        "indice": 0.8853618554623253,
+        "atende": true
+      },
+      {
+        "id": "bearing_plate",
+        "indice": 0.8077218297551336,
+        "atende": true
+      },
+      {
+        "id": "bearing_beam",
+        "indice": 1.3253316844819374,
+        "atende": false
+      },
+      {
+        "id": "plate_vy",
+        "indice": 0.11557585913828189,
+        "atende": true
+      },
+      {
+        "id": "plate_vu",
+        "indice": 0.15745765015895774,
+        "atende": true
+      },
+      {
+        "id": "plate_ny",
+        "indice": 0.15874274628631488,
+        "atende": true
+      },
+      {
+        "id": "plate_nu",
+        "indice": 0.21626713395326727,
+        "atende": true
+      },
+      {
+        "id": "plate_mu",
+        "indice": 0.283423770286124,
+        "atende": true
+      },
+      {
+        "id": "plate_ltb",
+        "indice": 0.2080365464489074,
+        "atende": true
+      },
+      {
+        "id": "interaction_y",
+        "indice": 0.0959610914597908,
+        "atende": true
+      },
+      {
+        "id": "interaction_u",
+        "indice": 0.2440035656019687,
+        "atende": true
+      },
+      {
+        "id": "block_plate",
+        "indice": 0.07595775989565322,
+        "atende": true
+      },
+      {
+        "id": "block_plate_u",
+        "indice": 0.2703339174415841,
+        "atende": true
+      },
+      {
+        "id": "beam_v",
+        "indice": 0.18866172958340646,
+        "atende": true
+      },
+      {
+        "id": "beam_n",
+        "indice": 0.3638321240878937,
+        "atende": true
+      },
+      {
+        "id": "block_beam_u",
+        "indice": 0.4435711565255966,
+        "atende": true
+      },
+      {
+        "id": "beam_vm",
+        "indice": 0.970373975216132,
+        "atende": true
+      },
+      {
+        "id": "weld",
+        "indice": 1.1264496124735472,
+        "atende": false
+      },
+      {
+        "id": "base_plate",
+        "indice": 0.7931287352265678,
+        "atende": true
+      },
+      {
+        "id": "support_shear",
+        "indice": 0.1717891054472764,
+        "atende": true
+      },
+      {
+        "id": "support_punch",
+        "indice": 1.2316810344827587,
+        "atende": false
+      },
+      {
+        "id": "ductility",
+        "indice": 1.3126975921907387,
+        "atende": false
+      },
+      {
+        "id": "weld_development",
+        "indice": 1.6536458333333333,
+        "atende": false
+      },
+      {
+        "id": "beam_buckling",
+        "indice": 0.18866172958340643,
+        "atende": true
+      }
+    ],
+    "avisos": [
+      {
+        "severity": "excluded",
+        "text": "Não é verificada a interação fora do plano da alma da viga de apoio sob N+V ou N excêntrico.",
+        "reference": "Escopo definido para a versão 0.5.1",
+        "origin": "model"
+      },
+      {
+        "severity": "interference",
+        "text": "A chapa/solda invade a região de mesa, concordância ou recorte da viga apoiada. Conferir alívios e montagem, preservando as dimensões resistentes calculadas.",
+        "reference": "Geometria e domínio do modelo",
+        "origin": "model"
+      },
+      {
+        "severity": "interference",
+        "text": "Chapa/solda interfere nas mesas ou concordâncias da viga de apoio.",
+        "reference": "Geometria e domínio do modelo",
+        "origin": "model"
+      },
+      {
+        "severity": "excluded",
+        "text": "As interferências indicadas não impedem o cálculo das dimensões nominais informadas e devem ser resolvidas no detalhamento de fabricação. Alívios, recortes ou ajustes que alterem a seção resistente, os furos ou o comprimento útil de solda exigem atualizar os dados e recalcular.",
+        "reference": "Premissa de detalhamento",
+        "origin": "model"
+      },
+      {
+        "severity": "info",
+        "text": "Entrada preservada. Verificação adicional com resultante de 45 kN na mesma direção: V = 18.014 kN; N = 41.237 kN.",
+        "reference": "NBR 8800, 6.1.5.2",
+        "origin": "model"
+      }
+    ]
+  },
+  {
+    "exemplo": "Teste_usuario_com_complemento",
+    "status": "NÃO ATENDE",
+    "verificacoes": 24,
+    "governante": {
+      "id": "bearing_beam",
+      "name": "Contato e rasgamento da alma",
+      "demand": 48483.615014639356,
+      "resistance": 36582.25,
+      "unit": "N",
+      "reference": "ABNT NBR 8800:2024, versão corrigida 2025, 6.3.3.3(a)",
+      "equation": "F_Rd = min(1,2·lc·t·fu; 2,4·db·t·fu) / γa2",
+      "substitution": "lc conservador = 21.269 mm; t = 4.3; fu = 450; Fmax = 48483.62 N",
+      "variables": "lc: menor distância livre possível a bordas ou furos, adotada para qualquer direção da força; t: espessura ligada; fu: ruptura do metal-base.",
+      "case": "Mínimo normativo de 45 kN"
+    },
+    "indices": [
+      {
+        "id": "bolts",
+        "indice": 0.8853618554623253,
+        "atende": true
+      },
+      {
+        "id": "bearing_plate",
+        "indice": 0.8077218297551336,
+        "atende": true
+      },
+      {
+        "id": "bearing_beam",
+        "indice": 1.3253316844819374,
+        "atende": false
+      },
+      {
+        "id": "plate_vy",
+        "indice": 0.11557585913828189,
+        "atende": true
+      },
+      {
+        "id": "plate_vu",
+        "indice": 0.15745765015895774,
+        "atende": true
+      },
+      {
+        "id": "plate_ny",
+        "indice": 0.15874274628631488,
+        "atende": true
+      },
+      {
+        "id": "plate_nu",
+        "indice": 0.21626713395326727,
+        "atende": true
+      },
+      {
+        "id": "plate_mu",
+        "indice": 0.283423770286124,
+        "atende": true
+      },
+      {
+        "id": "plate_ltb",
+        "indice": 0.2080365464489074,
+        "atende": true
+      },
+      {
+        "id": "interaction_y",
+        "indice": 0.0959610914597908,
+        "atende": true
+      },
+      {
+        "id": "interaction_u",
+        "indice": 0.2440035656019687,
+        "atende": true
+      },
+      {
+        "id": "block_plate",
+        "indice": 0.07595775989565322,
+        "atende": true
+      },
+      {
+        "id": "block_plate_u",
+        "indice": 0.2703339174415841,
+        "atende": true
+      },
+      {
+        "id": "beam_v",
+        "indice": 0.18866172958340646,
+        "atende": true
+      },
+      {
+        "id": "beam_n",
+        "indice": 0.3638321240878937,
+        "atende": true
+      },
+      {
+        "id": "block_beam_u",
+        "indice": 0.4435711565255966,
+        "atende": true
+      },
+      {
+        "id": "beam_vm",
+        "indice": 0.970373975216132,
+        "atende": true
+      },
+      {
+        "id": "weld",
+        "indice": 1.1264496124735472,
+        "atende": false
+      },
+      {
+        "id": "base_plate",
+        "indice": 0.7931287352265678,
+        "atende": true
+      },
+      {
+        "id": "support_shear",
+        "indice": 0.1717891054472764,
+        "atende": true
+      },
+      {
+        "id": "support_punch",
+        "indice": 1.2316810344827587,
+        "atende": false
+      },
+      {
+        "id": "ductility",
+        "indice": 1.3126975921907387,
+        "atende": false
+      },
+      {
+        "id": "weld_development",
+        "indice": 1.6536458333333333,
+        "atende": false
+      },
+      {
+        "id": "beam_buckling",
+        "indice": 0.18866172958340643,
+        "atende": true
+      }
+    ],
+    "avisos": [
+      {
+        "severity": "excluded",
+        "text": "Complemento até as mesas da viga de apoio representado apenas no detalhamento. O cálculo mantém a single plate retangular de altura hₚ e sua solda à alma, sem ganho de resistência pelo complemento ou pelas soldas adicionais. Não são avaliadas a estabilidade do complemento nem a redistribuição de esforços por ele.",
+        "reference": "Premissa de cálculo do complemento",
+        "origin": "model"
+      },
+      {
+        "severity": "interference",
+        "text": "O trecho nominal hₚ ou sua solda alcança os alívios do complemento. Preservar a seção e o comprimento útil considerados no cálculo ou atualizar os dados.",
+        "reference": "Geometria e domínio do modelo",
+        "origin": "model"
+      },
+      {
+        "severity": "excluded",
+        "text": "Não é verificada a interação fora do plano da alma da viga de apoio sob N+V ou N excêntrico.",
+        "reference": "Escopo definido para a versão 0.5.1",
+        "origin": "model"
+      },
+      {
+        "severity": "interference",
+        "text": "A chapa/solda invade a região de mesa, concordância ou recorte da viga apoiada. Conferir alívios e montagem, preservando as dimensões resistentes calculadas.",
+        "reference": "Geometria e domínio do modelo",
+        "origin": "model"
+      },
+      {
+        "severity": "interference",
+        "text": "Chapa/solda interfere nas mesas ou concordâncias da viga de apoio.",
+        "reference": "Geometria e domínio do modelo",
+        "origin": "model"
+      },
+      {
+        "severity": "excluded",
+        "text": "As interferências indicadas não impedem o cálculo das dimensões nominais informadas e devem ser resolvidas no detalhamento de fabricação. Alívios, recortes ou ajustes que alterem a seção resistente, os furos ou o comprimento útil de solda exigem atualizar os dados e recalcular.",
+        "reference": "Premissa de detalhamento",
+        "origin": "model"
+      },
+      {
+        "severity": "info",
+        "text": "Entrada preservada. Verificação adicional com resultante de 45 kN na mesma direção: V = 18.014 kN; N = 41.237 kN.",
+        "reference": "NBR 8800, 6.1.5.2",
+        "origin": "model"
+      }
+    ]
+  }
+]

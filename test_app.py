@@ -8,13 +8,13 @@ def test_ui_load_change_and_export():
     at=AppTest.from_file(str(APP),default_timeout=30).run()
     assert not at.exception
     assert any(x.value=='ATENDE ÀS VERIFICAÇÕES REALIZADAS' for x in at.success)
-    assert sum('Não é verificada a interação fora do plano' in x.value for x in at.caption)==1
+    assert sum('Não é verificada a interação fora do plano' in x.value for x in at.markdown)==1
     assert 'support_edge_distance' not in [x.key for x in at.number_input]
     name=next(x for x in at.selectbox(key='example').options if 'CS600' in x)
     at.selectbox(key='example').set_value(name)
     next(x for x in at.button if x.label=='Usar este exemplo').click().run()
     assert not at.exception
-    assert any('ATENDE AO ESCOPO' in x.value for x in at.success)
+    assert any('ATENDE ÀS VERIFICAÇÕES' in x.value for x in at.success)
     next(x for x in at.button if x.label=='Gerar memória Word').click().run()
     assert not at.exception
     initial_report=at.session_state['report']
@@ -63,18 +63,21 @@ def test_plate_position_visible_manual_and_invalid():
     assert any('GEOMETRIA INVÁLIDA' in x.value for x in at.error)
 
 
-def test_removed_full_depth_import_cannot_be_reinterpreted():
+def test_legacy_complement_import_and_export():
     import json
     from dataclasses import replace
     from lro.examples import presets
     legacy=replace(next(iter(presets().values())),plate_shape='between_flanges')
     at=AppTest.from_file(str(APP),default_timeout=30).run()
-    assert not any(x.key in ('plate_shape','restrained','opposite_stiffener','support_joint_weld') for x in [*at.selectbox,*at.checkbox,*at.number_input])
+    assert at.selectbox(key='plate_shape')
+    assert not any(x.key in ('restrained','opposite_stiffener','support_joint_weld') for x in [*at.selectbox,*at.checkbox,*at.number_input])
     at.get('file_uploader')[0].upload('antigo.json',json.dumps(legacy.to_dict()).encode(),'application/json').run()
     next(x for x in at.button if x.label=='Abrir arquivo').click().run()
     assert not at.exception
-    assert any('variante retirada' in x.value for x in at.error)
-    assert at.session_state['plate_shape']=='rectangular'
+    assert not at.error
+    assert at.session_state['plate_shape']=='between_flanges'
+    next(x for x in at.button if x.label=='Gerar memória Word').click().run()
+    assert not at.exception and at.session_state['report'][2][:2]==b'PK'
 
 
 def test_usi_options_follow_product_type():

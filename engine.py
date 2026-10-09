@@ -5,7 +5,7 @@ identificados, nunca tabelas LRFD convertidas por um fator global.
 """
 import math
 from dataclasses import replace
-from .models import SUPPORT_WEB_EXCLUSION
+from .models import SUPPORT_WEB_EXCLUSION, COMPLEMENT_ASSUMPTION, INTERFERENCE_ASSUMPTION
 from .models import Connection, Check, Issue, Result, STEELS, BOLTS, DIAMETERS
 
 from .additional_checks import additional_checks
@@ -84,9 +84,22 @@ def geometry(c:Connection):
     if c.support_joint_weld<0:issue("error","Filete mesa–alma não pode ser negativo.")
     if c.support_edge_distance<0:issue('error','Distância longitudinal livre na alma do apoio não pode ser negativa.')
     if c.N<0:issue("pending","Compressão axial está fora do domínio validado desta versão. Os cálculos de tração não serão aplicados a esse caso.")
-    if c.full_depth or c.opposite_stiffener:
-        issue('error','Chapa entre mesas e enrijecedor oposto não são avaliados nesta versão. Este projeto pertence à variante retirada; nenhum cálculo ou aprovação será reaproveitado. Inicie uma ligação retangular.','Escopo definido para a versão 0.5','configuration')
+    if c.opposite_stiffener:
+        issue('error','O enrijecedor oposto permanece fora do escopo. Desative essa opção no projeto; o complemento da própria single plate está disponível somente em viga–viga.','Escopo da versão','configuration')
         return out,{}
+    if c.full_depth:
+        if c.kind!='beam_web':
+            issue('error','O complemento entre mesas está disponível apenas na alma da viga de apoio.','Configuração','configuration');return out,{}
+        if not 0<c.root_width<=c.width or not 0<=c.corner_clip<min(c.root_width,c.root_height/2) or c.flange_weld<=0:
+            issue('error','Dimensões inválidas do complemento: largura positiva até a borda da chapa, alívio menor que a largura e a meia altura livre, filete positivo.');return out,{}
+        issue('excluded',COMPLEMENT_ASSUMPTION,'Premissa de cálculo do complemento')
+        radius=(c.support.d-c.support.clear)/2-c.support.tf
+        if c.corner_clip<radius:
+            issue('interference','O alívio de canto do complemento é menor que a concordância estimada do apoio. Ajustar o contorno na fabricação.')
+        if c.root_width>c.gap-c.clearance:
+            issue('interference','O complemento pode alcançar a ponta da viga apoiada; conferir o recorte do contorno e a folga de montagem.')
+        if c.beam_level+c.plate_top<c.support.tf+c.corner_clip or c.beam_level+c.plate_top+c.hp>c.support.d-c.support.tf-c.corner_clip:
+            issue('interference','O trecho nominal hₚ ou sua solda alcança os alívios do complemento. Preservar a seção e o comprimento útil considerados no cálculo ou atualizar os dados.')
     if c.cope!="none" and (min(c.cope_top,c.cope_length)<=0 or (c.cope=="both" and c.cope_bottom<=0)):
         issue("error","As dimensões dos recortes ativos devem ser positivas.")
     if c.coped_top+c.coped_bottom>=c.beam.d:
@@ -101,7 +114,7 @@ def geometry(c:Connection):
             issue('pending','A altura conectada deve ser pelo menos metade da seção remanescente no modelo de recorte superior.','AISC Manual Parte 9; Dowswell (2018)')
     if c.support_web_combined_excluded:
         issue('excluded',SUPPORT_WEB_EXCLUSION,'Escopo definido para a versão 0.5.1')
-    elif c.kind=="beam_web" and c.N>0 and not c.full_depth:
+    elif c.kind=="beam_web" and c.N>0:
         try:
             patch=web_patch(c)
             required=patch['required_end_distance']
@@ -138,11 +151,11 @@ def geometry(c:Connection):
     if c.bolt=="ASTM A307":issue("pending","O detalhamento de ductilidade da single plate com parafusos comuns A307 não está validado nesta versão.")
     k=(c.beam.d-c.beam.clear)/2
     if c.plate_top<max(k,c.coped_top)+c.weld or c.plate_top+c.hp>min(c.beam.d-k,c.beam.d-c.coped_bottom)-c.weld:
-        issue("error","A chapa/solda invade a região de mesa, concordância ou recorte da viga apoiada. Ajustar altura ou posição da chapa.")
+        issue("interference","A chapa/solda invade a região de mesa, concordância ou recorte da viga apoiada. Conferir alívios e montagem, preservando as dimensões resistentes calculadas.")
     for y in c.y_bolts:
         if min(y-max(k,c.coped_top),min(c.beam.d-k,c.beam.d-c.coped_bottom)-y)<c.tool_radius:
-            issue("error","Há interferência do envelope de montagem de parafuso/porca com mesa, concordância ou recorte.");break
-    if c.a<c.weld+c.tool_radius:issue("error","Envelope de montagem do parafuso invade a solda/face do apoio.")
+            issue("interference","Há interferência do envelope de montagem de parafuso/porca com mesa, concordância ou recorte.");break
+    if c.a<c.weld+c.tool_radius:issue("interference","Envelope de montagem do parafuso invade a solda/face do apoio.")
     ts=c.support.tf if c.kind=="column_flange" else c.support.tw
     smaller=min(c.tp,ts)
     wmin=3 if smaller<=6.3 else 5 if smaller<=12.5 else 6 if smaller<=19 else 8
@@ -154,7 +167,7 @@ def geometry(c:Connection):
         ks=(c.support.d-c.support.clear)/2
         py=c.beam_level+c.plate_top
         if py<ks+c.weld or py+c.hp>c.support.d-ks-c.weld:
-            issue("error","Chapa/solda interfere nas mesas ou concordâncias da viga de apoio.")
+            issue("interference","Chapa/solda interfere nas mesas ou concordâncias da viga de apoio.")
         projection=(c.support.bf-c.support.tw)/2
         # Nas faixas ocupadas pelas mesas do apoio, é necessário afastar a ponta
         # da viga ou retirar material. Folga de montagem explicitamente configurável.
@@ -164,10 +177,13 @@ def geometry(c:Connection):
             if overlaps and c.gap<projection+c.clearance:
                 enough_length=c.cope!="none" and c.gap+c.cope_length>=projection+c.clearance
                 enough_depth=(full_low+depth>=hi) if label=="superior" else (full_high-depth<=lo)
-                if not (enough_length and enough_depth):issue("error",f"Interferência com a mesa {label} da viga de apoio. Afastar a ponta ou ajustar o recorte e a folga.")
-    if c.plate_top+c.hp>c.beam.d:issue("error","A chapa ultrapassa a altura da viga apoiada.")
+                if not (enough_length and enough_depth):issue("interference",f"Interferência com a mesa {label} da viga de apoio. Afastar a ponta ou ajustar o recorte e a folga.")
+    if c.plate_top+c.hp>c.beam.d:issue("interference","A chapa ultrapassa a altura da viga apoiada.")
+    if any(y-c.dh_net/2<=c.coped_top or y+c.dh_net/2>=c.beam.d-c.coped_bottom for y in c.y_bolts):
+        issue('error','Um furo ultrapassa a seção remanescente da viga; não há ligamento resistente válido para o modelo.')
     if grip_factor(c.tp+c.beam.tw,c.db)<=0:issue("error","Pega fora do domínio da redução positiva de resistência dos parafusos.","NBR 8800, 6.3.7")
-    if c.gap<c.weld:issue("error", "A ponta da alma apoiada interfere no filete junto ao apoio: g deve superar o alcance da solda.")
+    if c.gap<c.weld:issue("interference", "A ponta da alma apoiada interfere no filete junto ao apoio: g deve superar o alcance da solda.")
+    if any(i.severity=='interference' for i in out):issue('excluded',INTERFERENCE_ASSUMPTION,'Premissa de detalhamento')
     if c.N>0 and abs(c.eccentric_n)>1e-6:
         issue("info",f"N é referido ao eixo da viga. Incluído |N·eN|, com eN = {c.eccentric_n:.2f} mm, no momento local.")
     g=dict(hp=c.hp,width=c.width,dh=c.dh,dh_net=c.dh_net,beam_edge=c.beam_edge,e=c.bolt_centroid_x,emin=emin,pmin=pmin,pmax=pmax,ductile=ductile,ts=ts)
@@ -258,12 +274,14 @@ def evaluate(c:Connection):
     issues,g=geometry(c);r=Result(issues=issues,geometry=g)
     if any(i.severity=="error" for i in issues) or c.N<0:return r
     try:
-        calculator=support_component_checks if c.full_depth else strength
-        r.actual=calculator(c,c.V,c.N,'Entrada')
+        # O complemento não modifica o caminho resistente da single plate.
+        # Sua área e soldas extras não entram nas resistências calculadas.
+        calc=replace(c,plate_shape='rectangular') if c.full_depth else c
+        r.actual=strength(calc,c.V,c.N,'Entrada')
         R=math.hypot(c.V,c.N)
         factor=design_factor(c)
         r.minimum_factor=factor
-        r.checks=calculator(c,c.V*factor,c.N*factor,"Mínimo normativo de 45 kN" if factor>1 else "Entrada")
+        r.checks=strength(calc,c.V*factor,c.N*factor,"Mínimo normativo de 45 kN" if factor>1 else "Entrada")
         if R==0:r.issues.append(Issue("pending","Esforços nulos: a direção do mínimo normativo não está definida. Informe o caso de cálculo."))
         if factor>1:r.issues.append(Issue("info",f"Entrada preservada. Verificação adicional com resultante de 45 kN na mesma direção: V = {c.V*factor/1000:.3f} kN; N = {c.N*factor/1000:.3f} kN.","NBR 8800, 6.1.5.2"))
     except (ZeroDivisionError,ValueError,OverflowError) as exc:

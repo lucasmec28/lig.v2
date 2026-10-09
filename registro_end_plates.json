@@ -1,0 +1,68 @@
+[
+  {
+    "example": "End_plate_rotulada",
+    "status": "ATENDE ÀS VERIFICAÇÕES REALIZADAS",
+    "checks": 17,
+    "maximum_index": 0.9525,
+    "minimum_force_factor": 4.024922359499621,
+    "actions": {
+      "tp_required": 2.427755276009561,
+      "column_tf_required": 2.2660561160245636,
+      "V": 44274.145954495834,
+      "N": 8049.844718999243,
+      "M": 0.0,
+      "bolt_tension": 1006.2305898749054,
+      "bolt_shear": 5534.268244311979,
+      "T": 8049.844718999243,
+      "C": 0
+    }
+  },
+  {
+    "example": "End_plate_engastada_duas_extensoes",
+    "status": "ATENDE ÀS VERIFICAÇÕES REALIZADAS",
+    "checks": 17,
+    "maximum_index": 0.8296687709971999,
+    "minimum_force_factor": 1.1235963812375753,
+    "actions": {
+      "Meq": 40438427.3079589,
+      "Yp": 2603.9500479349736,
+      "Yc": 4619.986093108153,
+      "tp_required": 8.713364614535656,
+      "column_tf_required": 6.5415682660921695,
+      "h1": 434.6,
+      "h2": 340.8,
+      "z": 390.2,
+      "V": 44943.855249503016,
+      "N": 2247.1927624751506,
+      "M": 40000000.0,
+      "bolt_tension": 26075.849437683064,
+      "bolt_shear": 5617.981906187877,
+      "T": 104303.39775073226,
+      "C": 102056.2049882571
+    }
+  },
+  {
+    "example": "End_plate_engastada_acima",
+    "status": "ATENDE ÀS VERIFICAÇÕES REALIZADAS",
+    "checks": 17,
+    "maximum_index": 0.8296687709971999,
+    "minimum_force_factor": 1.1235963812375753,
+    "actions": {
+      "Meq": 40438427.3079589,
+      "Yp": 2603.9500479349736,
+      "Yc": 4619.986093108153,
+      "tp_required": 8.713364614535656,
+      "column_tf_required": 6.5415682660921695,
+      "h1": 434.6,
+      "h2": 340.8,
+      "z": 390.2,
+      "V": 44943.855249503016,
+      "N": 2247.1927624751506,
+      "M": 40000000.0,
+      "bolt_tension": 26075.849437683064,
+      "bolt_shear": 7490.642541583836,
+      "T": 104303.39775073226,
+      "C": 102056.2049882571
+    }
+  }
+]

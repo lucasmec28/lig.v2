@@ -1,57 +1,89 @@
-# LRO Ligações — versão 0.5.1
+# LRO Ligações 0.7.1
 
 Desenvolvido por LRO Soluções de engenharia LTDA.
 
-[LinkedIn — Lucas Oliveira](https://www.linkedin.com/in/lucas-oliveira-722723149/?isSelfProfile=true)
+[LinkedIn de Lucas Oliveira](https://www.linkedin.com/in/lucas-oliveira-722723149/?isSelfProfile=true)
 
-Single plate **retangular**, em perfis I: viga–viga e viga–mesa de pilar, encontro a 90°. Forças em kgf, momentos em kgf·m, dimensões em mm. Entradas já majoradas; não há nova majoração de ações. O mínimo resistente de 45 kN é verificado separadamente quando aplicável.
+Aplicativo Streamlit para ligações de perfis I, com desenho proporcional, verificação geométrica, memória Word editável e projetos JSON. Forças em **kgf**, momentos em **kgf·m**, dimensões em **mm**. Diâmetros e espessuras têm opções em polegadas. As ações inseridas já são de cálculo.
 
 ## Atualizar e abrir
 
-1. Pare o aplicativo no terminal com **Ctrl+C**.
-2. Extraia este pacote em uma **pasta nova** e preserve seus projetos JSON.
-3. Abra o terminal na pasta que contém `app.py`. Ative seu ambiente Python 3.12 e execute:
+1. Pare o app no terminal com **Ctrl+C**.
+2. Extraia este pacote em uma **pasta nova**, preservando seus projetos JSON e a versão anterior.
+3. Abra o terminal na pasta que contém `app.py`, ative seu ambiente Python 3.12 e execute:
 
 ```bash
 python -m pip install -r requirements.txt
 python -m streamlit run app.py
 ```
 
-Se ainda não houver ambiente: `python -m venv .venv`; no PowerShell, ative com `.venv\Scripts\Activate.ps1`. Para evitar problemas de política do PowerShell, também é possível executar diretamente `.venv\Scripts\python.exe -m pip install -r requirements.txt` e `.venv\Scripts\python.exe -m streamlit run app.py`.
+Para uma instalação nova no Windows:
 
-A atualização é local; este pacote não altera seu app hospedado. Para hospedagem, atualize também `lro/`, `data/` e os demais arquivos do repositório, preservando a estrutura. Não envie `.venv`.
+```powershell
+py -3.12 -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe -m streamlit run app.py
+```
 
-## Decisões desta versão
+Para reabrir depois, basta o último comando. Não precisa reinstalar as bibliotecas em cada uso. Fechar apenas a aba do navegador não encerra o processo do aplicativo.
 
-Na revisão 0.5.1, a interação fora do plano da alma do apoio passa de pendência para exclusão explícita, conforme solicitado. A nota não atribui resistência ao mecanismo omitido.
+O pacote não altera automaticamente o app hospedado. Para Streamlit Cloud, atualize também as pastas `lro/` e `data/`, mantendo a estrutura; não envie `.venv`.
 
-- **Contenção eficaz da viga apoiada é fixa**, inclusive na importação de projetos antigos. Não há pergunta na tela nem cálculo de cortante horizontal/momento no eixo de menor inércia. N axial permanece como entrada.
-- A solda da ligação é **single plate → apoio**. A viga apoiada é parafusada à chapa.
-- Os perfis soldados têm juntas internas mesa–alma de **penetração total, com metal de adição compatível**, por hipótese; não se informa filete de fabricação.
-- Para o pilar, admite-se impedido o deslocamento lateral relativo entre as mesas na região da ligação. Essa premissa é registrada e independe da penetração total. A estabilidade global continua no projeto estrutural.
-- **Chapa/enrijecedores entre mesas foram retirados**. Há aviso curto; essa variante não é avaliada nem convertida automaticamente ao abrir arquivos antigos.
-- Geometrias e esforços dos dois testes enviados foram preservados. As hipóteses acima são novas e ficam expressas no JSON e no Word.
+## Famílias disponíveis
 
-## O que os exemplos mostram
+| Seleção | Ações de entrada | Arranjo |
+|---|---|---|
+| Single plate | V e N de tração | Chapa soldada à mesa da coluna ou alma da viga de apoio; viga apoiada parafusada |
+| Alma de coluna com duas talas | V e N com sinal | Talas independentes, nervura e quatro horizontais soldados à coluna |
+| End plate rotulada | V e N com sinal | Chapa de altura total, sobra inicial de 5 mm, parafusos entre mesas |
+| End plate engastada | M, V e N com sinal | Modelo 4E sem nervuras, extensão acima e abaixo ou somente acima |
 
-| Exemplo | Resultado | Maior índice resistente |
-|---|---|---:|
-| W410×38,8 → CS600×281, g=10 mm | Atende ao escopo local e às premissas declaradas | 0,454 |
-| W360×39 → W410×38,8, g=80 mm | Atende às verificações realizadas; interação da alma excluída | 0,669 |
+N positivo é tração; N negativo é compressão. Na end plate engastada, M positivo traciona a mesa superior. A ligação com extensão somente acima aceita esse sentido de momento; para o sentido inverso, use extensão também abaixo.
 
-**Nota de escopo:** Não é verificada a interação fora do plano da alma da viga de apoio sob N+V ou N excêntrico. O app e o Word indicam essa exclusão junto ao resultado. O atendimento refere-se somente aos itens calculados. Os cálculos isolados de plastificação e punção sob N, e o campo de distância longitudinal, ficam restritos à tração centrada sem cortante. Outras falhas e pendências continuam sendo sinalizadas.
+## Ajustes da versão 0.7.1
 
-O perfil utilizado nos arquivos enviados é **CS 600×281**, não CVS. O catálogo ou a seção personalizada permite escolher outro perfil real; não existe equivalência automática entre essas designações.
+- Interferências de concordância, contato e envelope de montagem passam a ser avisos. Quando os dados permitem, o app calcula e libera Word e JSON, preservando os esforços e as dimensões nominais. Entradas inválidas, furos sem ligamento e limites resistentes/normativos do modelo continuam tratados separadamente.
+- O complemento até as faces internas das mesas da viga de apoio voltou à single plate viga–viga. Ajuste largura, alívio de canto e filete às mesas. O complemento e as soldas adicionais aparecem no desenho e na memória, sem acrescentar verificações nem aumentar resistências: usa-se a chapa retangular nominal de altura hₚ e sua solda à alma. Sua estabilidade e a redistribuição de esforços estão fora desse cálculo, registradas nas premissas finais.
+- O enrijecedor oposto não faz parte desta atualização. O complemento não está disponível na ligação à mesa de coluna.
+- `examples/Projeto_usuario_W150_W250.json` reproduz o arquivo recebido, sem alterar entradas. Os novos Word `Teste_usuario_W150_W250.docx` e `Teste_usuario_com_complemento.docx` mostram o cálculo com avisos. O segundo é uma variante ilustrativa com largura do complemento de 45 mm. Ambos indicam as falhas calculadas; retirar o bloqueio de montagem não transforma esses resultados em aprovação.
+- Os sete Word anteriores são exemplos da versão 0.7.0, preservados. Os relatórios gerados pelo app atualizado levam a versão 0.7.1.
 
-## Arquivos e verificação
+## Recursos da versão 0.7
 
-`examples/` contém os projetos atuais, desenhos SVG e duas memórias Word compactas. O arquivo `Teste_usuario_v03_original.json` mantém a entrada histórica original para conferir a migração. `docs/REVISAO_TECNICA.md` descreve a revisão; `docs/METODOLOGIA.md` contém os modelos e limites; `docs/registro_validacao.json` registra cada resultado.
+- O resultado de atendimento passou a ser **ATENDE ÀS VERIFICAÇÕES REALIZADAS**. As premissas e exclusões ficam no final da tela e no final do Word. Falhas resistentes, geometrias inválidas e condições reais fora do domínio continuam sendo indicadas.
+- As end plates verificam parafusos sob tração, cisalhamento e interação elíptica; contato nos furos; blocos da chapa; soldas e metal-base; alma da viga; mesa e alma da coluna. A engastada inclui o painel da coluna sob as premissas declaradas.
+- A rotulada compara a espessura com os limites de flexibilidade do detalhamento e com a espessura necessária para não omitir efeito alavanca sob N.
+- A engastada calcula a espessura mínima da chapa e da mesa da coluna pelo procedimento de chapa espessa do DG39. Adota-se o comportamento usual pela NBR 6.1.2.3, dentro do domínio do modelo. Não se calcula uma curva momento–rotação ou uma mola Si para a análise global.
+- Os projetos antigos de single plate e duas talas continuam aceitos. As end plates usam um tipo JSON próprio. Ao carregar um exemplo ou projeto de end plate, o tipo exibido acompanha o arquivo.
 
-**113 testes de software aprovados; 13 comparações pontuais com referências aprovadas.** Não são validação experimental integral do nó. O exemplo didático W310→W150 é mantido sem alteração e passa a ser reprovado pelo novo critério conservador de escoamento localizado no pilar (índice 1,010).
+## Domínio das end plates
+
+A end plate engastada usa a geometria **4E** do Design Guide 39, com dois parafusos por linha e sem enrijecedores. Os intervalos ensaiados do guia, incluindo a margem de 10%, são conferidos. Exige-se momento dominante: `|N|(d−tf) ≤ |M|`. Aço da chapa com fy até 345 MPa. Não se extrapola o procedimento para axial dominante, chapa enrijecida, múltiplas colunas de parafusos ou outros padrões de furação.
+
+A rotulada usa gabarito de 90–140 mm e chapa com fy até 275 MPa, inicialmente A36. O limite adotado é 10 mm para vigas até 457 mm de altura e 12 mm para vigas maiores. Os demais aços continuam no catálogo; escolher material fora desse domínio produz indicação para revisar a escolha.
+
+A conferência normativa mínima de 45 kN atua sobre a resultante N/V, com direção e sentido preservados. **O momento externo não é multiplicado por esse fator.** Não se aplica automaticamente um suposto mínimo de momento de 50% da resistência da viga.
+
+Nas end plates engastadas, as juntas **viga–chapa** são CJP nas duas mesas e na alma, com metal de adição compatível. Na rotulada são filetes contínuos. Em ambas, **chapa–coluna é parafusada**.
+
+A coluna é contínua, sem extremidade ou emenda próxima; não há outra viga ou cargas locais concorrentes no nó. O painel usa a hipótese `Ncol,Sd ≤ 0,4 Ag,col fy,col` e não desconta cortante favorável da coluna. As verificações globais dos membros e a compatibilização com o modelo estrutural permanecem no projeto.
+
+## Exemplos e documentação
+
+`examples/` contém projetos JSON, desenhos SVG, as sete memórias da versão 0.7 e dois novos relatórios dos ajustes 0.7.1. Os três exemplos de end plate usam W410×38,8 chegando à mesa de CS600×281. Os esforços são exemplos de uso, não um dimensionamento aprovado para uma obra.
+
+- `docs/END_PLATES_METODOLOGIA.md`: equações, hipóteses, limites e fontes das novas famílias.
+- `docs/registro_end_plates.json`: resultados numéricos reproduzíveis dos exemplos.
+- `docs/DUAS_TALAS_METODOLOGIA.md`: modelo local da nervura e talas.
+- `docs/REVISAO_TECNICA.md` e `docs/METODOLOGIA.md`: histórico técnico das single plates.
+
+Nas duas talas, estabilidade acoplada e capacidade de rotação do conjunto continuam fora das verificações de componentes; a nota está nas premissas. Nas single plates, a interação fora do plano da alma da viga de apoio sob N+V ou N excêntrico continua excluída. A alteração de apresentação não atribui resistência a esses mecanismos.
+
+## Testes
 
 ```bash
 python -m pip install -r requirements-dev.txt
-python -m pytest -q
+python -m pytest -q tests
 ```
 
-Projetos dos esquemas 1–3 são aceitos e exportados no esquema 4, com as hipóteses fixas declaradas. Projetos da variante entre mesas são recusados. Em qualquer caso fora do domínio, o app deve ser tratado conforme o estado exibido, e não apenas pelo maior índice.
+Incluem regressão das famílias anteriores, comparação numérica com o exemplo 5.3-1 do DG39, substituição independente das equações da NBR, conversão de unidades, sinais, domínio, interação nos parafusos, importação e exportação. São testes de software e conferências analíticas identificadas, não validação experimental do conjunto.

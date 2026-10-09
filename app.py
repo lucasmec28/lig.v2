@@ -21,6 +21,20 @@ st.markdown('''<style>
  div[data-testid="stVerticalBlockBorderWrapper"] {border-radius:12px}
  </style>''',unsafe_allow_html=True)
 
+# Preserva os dados do complemento quando seus campos ficam ocultos.
+for key in ('root_width','corner_clip','flange_weld'):
+    if key in st.session_state:st.session_state[key]=st.session_state[key]
+family=st.sidebar.selectbox('Tipo de ligação',['Single plate','Alma de coluna · duas talas','End plate · rotulada','End plate · engastada'],key='connection_family')
+if family=='Alma de coluna · duas talas':
+    from lro.double_cover_ui import render
+    render()
+    st.stop()
+
+if family.startswith('End plate'):
+    from lro.end_plate_ui import render
+    render('pinned' if family.endswith('rotulada') else 'moment')
+    st.stop()
+
 P=profiles();PRESETS=presets()
 
 
@@ -69,6 +83,11 @@ def profile_changed(prefix):
         st.session_state[prefix+'_steel']='ASTM A36' if p.family in ('CS','CVS','VS') else 'ASTM A572 Gr.50'
 
 
+def support_kind_changed():
+    if st.session_state.kind=='column_flange':
+        st.session_state.plate_shape='rectangular'
+
+
 def profile_widget(prefix,label):
     name=st.selectbox(label,['Seção I personalizada']+list(P),key=prefix+'_name',on_change=profile_changed,args=(prefix,))
     if name in P:return P[name]
@@ -85,7 +104,7 @@ def profile_widget(prefix,label):
 with st.sidebar:
     st.markdown('<div class="eyebrow">LRO · ENGENHARIA</div>',unsafe_allow_html=True)
     st.title('Ligações')
-    st.caption(f'Versão {VERSION} · single plate retangular')
+    st.caption(f'Versão {VERSION} · single plate')
     st.text_input('Projeto ou identificação',key='project')
     st.selectbox('Carregar exemplo',list(PRESETS),key='example')
     st.button('Usar este exemplo',on_click=load_example,width='stretch')
@@ -97,19 +116,19 @@ with st.sidebar:
     st.caption('Nesta versão')
     st.markdown('**Single plate**\n\nViga–viga e viga–mesa de pilar. Um caso de esforços já majorados.')
     with st.expander('Próximas ligações'):
-        st.write('Prioridade: concluir os modelos de single plate, incluindo recortes, apoio sob tração e enrijecedores. Depois, cantoneira simples e dupla.')
+        st.write('A ligação à alma de coluna com duas talas está no seletor acima, com seu escopo próprio. Próximas famílias previstas: cantoneira simples e dupla.')
     st.link_button('LinkedIn · Lucas Oliveira',LINK,width='stretch')
 
 st.markdown('<div class="eyebrow">LIGAÇÕES DE AÇO</div>',unsafe_allow_html=True)
 st.title('Single plate')
-st.caption('Escopo: single plate retangular. Chapa/enrijecedores entre mesas não são avaliados nesta versão.')
+st.caption('Viga–viga ou viga–mesa de pilar; complemento até as mesas disponível em viga–viga.')
 st.markdown('<p class="muted">Escolha os perfis, ajuste o detalhe e acompanhe as verificações. A memória usa os mesmos dados e o mesmo desenho.</p>',unsafe_allow_html=True)
 
 left,right=st.columns([1,1.65],gap='large')
 with left:
     with st.container(border=True):
         st.subheader('1 · Ligação e esforços')
-        st.selectbox('Tipo de apoio',['beam_web','column_flange'],format_func=lambda x:'Alma de viga — viga a 90°' if x=='beam_web' else 'Mesa de pilar — alinhada à alma',key='kind')
+        st.selectbox('Tipo de apoio',['beam_web','column_flange'],format_func=lambda x:'Alma de viga — viga a 90°' if x=='beam_web' else 'Mesa de pilar — alinhada à alma',key='kind',on_change=support_kind_changed)
         beam=profile_widget('beam','Viga apoiada')
         support=profile_widget('support','Perfil de apoio')
         loads=st.columns(2)
@@ -119,6 +138,14 @@ with left:
         st.caption('Modelo no plano: cortante vertical, tração axial e momento local em torno da maior inércia. Viga apoiada com contenção eficaz por hipótese fixa.')
     with st.container(border=True):
         st.subheader('2 · Detalhamento')
+        st.selectbox('Formato da single plate',['rectangular','between_flanges'] if st.session_state.kind=='beam_web' else ['rectangular'],
+                     format_func=lambda x:'Retangular' if x=='rectangular' else 'Com complemento até as mesas do apoio',key='plate_shape')
+        if st.session_state.plate_shape=='between_flanges':
+            with st.expander('Complemento até as mesas',expanded=True):
+                st.number_input('Largura do complemento bᵣ (mm)',1.,1000.,key='root_width')
+                st.number_input('Alívio de canto c (mm)',0.,200.,key='corner_clip')
+                st.number_input('Solda do complemento às mesas: filete (mm)',1.,25.,key='flange_weld')
+                st.caption(f'Altura entre as faces internas das mesas: {support.d-2*support.tf:g} mm. Complemento de mesma espessura da chapa; dimensões e soldas adicionais apenas para detalhamento.')
         st.selectbox('Colunas de parafusos',[1,2],key='bolt_columns',help='Calcula o grupo bidimensional de parafusos e os caminhos de ruptura da chapa retangular.')
         if st.session_state.bolt_columns==2:st.number_input('Passo horizontal s (mm)',1.,400.,key='gauge')
         cols=st.columns(2)
@@ -158,7 +185,7 @@ with left:
             st.checkbox('Informar espessura real da chapa',key='custom_t')
             if st.session_state.custom_t:st.number_input('Espessura real tₚ (mm)',1.,50.,key='real_t',format='%.4f')
     centered_n=abs(beam.d/2-(st.session_state.plate_top+(2*st.session_state.edge_v+(st.session_state.n-1)*st.session_state.pitch)/2))<1e-8
-    if st.session_state.kind=='beam_web' and nk>0 and vk==0 and centered_n and st.session_state.plate_shape=='rectangular':
+    if st.session_state.kind=='beam_web' and nk>0 and vk==0 and centered_n:
         with st.expander('Alma do apoio sob tração',expanded=True):
             st.number_input('Menor distância livre longitudinal na alma (mm)',0.,100000.,key='support_edge_distance',help='Do eixo da chapa até a extremidade, abertura ou outra região carregada mais próxima, medida ao longo da viga de apoio. O mesmo valor conservador vale para os dois sentidos. Zero = não informado.')
             st.caption('A plastificação usa a orientação real da chapa: sua altura atravessa a alma e sua espessura fica na direção longitudinal do apoio. Modelo aplicável à tração direta centrada, sem cortante.')
@@ -198,7 +225,7 @@ with right:
             st.image(drawing_cached(payload,'png'),width='stretch')
         if r.status=='GEOMETRIA INVÁLIDA':st.error(r.status)
         elif r.status=='NÃO ATENDE':st.error(r.status+' · revisar os itens com índice > 1')
-        elif r.status=='VERIFICAÇÃO INCOMPLETA':st.warning(r.status)
+        elif any(i.severity in ('pending','interference') for i in r.issues):st.warning(r.status)
         else:st.success(r.status)
         ms=st.columns(3)
         ms[0].metric('Aba parafusada (mm)' if c.full_depth else 'Chapa (mm)',f'{c.width:g} × {c.hp:g}',f't = {c.tp:.3f} mm',delta_color='off')
@@ -209,13 +236,11 @@ with right:
         if any(x.id=='support_punch' and not x.passed for x in r.checks):
             st.info('O requisito de hierarquia contra punção é uma condição do método: compara a espessura da chapa com um limite, não esforço com resistência. Seu descumprimento exige revisar o detalhe ou fazer uma verificação específica do apoio.')
         for issue in r.issues:
-            if issue.severity=='excluded':
-                st.caption('Nota: '+issue.text)
-                continue
-            f=st.error if issue.severity=='error' else st.warning if issue.severity=='pending' else st.info
+            if issue.severity=='excluded':continue
+            f=st.error if issue.severity=='error' else st.warning if issue.severity in ('pending','interference') else st.info
             f((issue.origin_label+': ' if issue.severity=='pending' else '')+issue.text+'  ['+issue.reference+']')
-        if c.full_depth:
-            st.error('SEM CONCLUSÃO GLOBAL: os índices abaixo abrangem apenas componentes isolados. Parafusos, estabilidade acoplada e rotação desta variante permanecem sem validação.')
+        if any(i.severity=='interference' for i in r.issues):
+            st.caption('Cálculo e exportação liberados para as dimensões informadas. Confira os avisos de montagem antes de definir o detalhe de fabricação.')
         if r.checks:
             st.caption('Todos os índices exibidos abaixo incluem o mínimo normativo quando aplicável. Os índices se referem somente às verificações realizadas.')
     with st.container(border=True):
@@ -253,13 +278,19 @@ with tabs[2]:
 with tabs[3]:
     st.markdown('''**Cálculo implementado:** single plate retangular, uma ou duas colunas de 2–12 linhas de parafusos, cortante e tração, parafusos por contato, furos padrão e dois filetes de oficina. Inclui desenho proporcional, importação e exportação de projeto e memória Word.
 
-**Chapa/enrijecedores entre mesas:** retirados da seleção. Esta variante não é avaliada; projetos antigos dessa variante não geram resultados nesta versão.
+**Complemento até as mesas:** disponível na single plate viga–viga, apenas para detalhamento, sem novas verificações ou ganho de resistência. O cálculo mantém a chapa retangular nominal e sua solda à alma; as premissas constam no final da página.
 
-**Cobertura atual:** recortes dentro do domínio, ductilidade, solda chapa–apoio e metal-base das juntas de penetração total do perfil de pilar são calculados. No pilar, o momento é transportado à alma e suas zonas de tração/compressão são verificadas. A alma sob tração direta centrada, sem cortante, recebe cálculo por linhas de plastificação e punção, dentro de seu domínio. A interação fora do plano sob N+V ou N excêntrico é excluída do cálculo e indicada por uma nota junto ao resultado. A contenção eficaz da viga apoiada é hipótese fixa. Não se aplicam cortante horizontal nem momento no eixo de menor inércia. O apoio conserva suas próprias verificações locais; a estabilidade global permanece no projeto estrutural e o impedimento de deslocamento relativo das mesas do pilar é uma premissa registrada na memória.
+**Interferências:** os avisos de concordância, contato e acesso de montagem permitem calcular e exportar as dimensões nominais. Entradas inválidas, perda de ligamento resistente e demais impedimentos do modelo continuam bloqueando o cálculo.
 
-**Prioridade de desenvolvimento:** concluir e validar as pendências das duas ligações antes de ampliar para cantoneiras. A revisão consolidada acompanha o pacote em docs/REVISAO_TECNICA.md.
+**Cobertura atual:** recortes dentro do domínio, ductilidade, solda chapa–apoio e metal-base das juntas de penetração total do perfil de pilar são calculados. No pilar, o momento é transportado à alma e suas zonas de tração/compressão são verificadas. A alma sob tração direta centrada, sem cortante, recebe cálculo por linhas de plastificação e punção, dentro de seu domínio. A interação fora do plano sob N+V ou N excêntrico é excluída do cálculo e indicada nas premissas ao final da página. A contenção eficaz da viga apoiada é hipótese fixa. Não se aplicam cortante horizontal nem momento no eixo de menor inércia. O apoio conserva suas próprias verificações locais; a estabilidade global permanece no projeto estrutural e o impedimento de deslocamento relativo das mesas do pilar é uma premissa registrada na memória.
+
+**Outras famílias:** duas talas e end plates estão disponíveis no seletor lateral, com domínio e premissas próprios. A revisão das single plates acompanha o pacote em docs/REVISAO_TECNICA.md.
 
 O P902-23W contém tabelas complementares; suas tabelas 10-A/10-B são para paredes de perfis tubulares e não são aplicadas às almas dos perfis I desta versão.''')
 st.divider()
+st.subheader('Premissas adotadas')
+st.write('Modelo plano; viga com contenção eficaz; juntas internas mesa–alma dos perfis soldados com penetração total e metal de adição compatível. A análise global dos membros e do contraventamento pertence ao projeto da estrutura. Não se incluem atrito, fadiga, vibração ou ações cíclicas.')
+for issue in r.issues:
+    if issue.severity=='excluded':st.write(issue.text)
 st.caption(BRAND)
 st.link_button('Contato no LinkedIn',LINK)

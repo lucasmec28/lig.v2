@@ -144,5 +144,15 @@
     "url": "https://www.steelcentre.ca/_files/ugd/7b6522_403aeeaa40534659b55c46cbec0e842c.pdf",
     "sha256": "ae099893e47e8706e5f459fa9b8b87348220c98a081b8dc56dcb60078ea7af92",
     "utilizacao": "Revisão adicional: capítulos 4.4, 5.4 e 6.3. O programa de ensaios e os limites declarados não validam automaticamente a chapa vertical entre mesas na alma de viga. As recomendações de outra configuração não foram transplantadas para remover as pendências do app."
+  },
+  {
+    "titulo": "Fortney e Thornton (2016), Analysis and Design of Stabilizer Plates in Single-Plate Shear Connections",
+    "url": "https://doi.org/10.62913/engj.v53i1.1095",
+    "utilizacao": "Ligação com duas talas: mecanismo de estabilização e momento induzido na coluna; referência de comportamento, sem transferir validação de outra geometria."
+  },
+  {
+    "titulo": "Sapkota et al. (2024), Behavior of Extended Single-Plate Shear Connections Subjected to Combined Shear and Compression Forces Using Finite Element Analysis",
+    "url": "https://doi.org/10.62913/engj.v61i4.1332",
+    "utilizacao": "Limites das interações sob compressão; estabilidade e rotação do novo nó permanecem pendentes."
   }
 ]

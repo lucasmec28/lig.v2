@@ -85,18 +85,18 @@ def test_old_project_preserves_loads_geometry_and_applies_requested_fixed_restra
 def test_centered_pure_tension_needs_space_and_combined_mechanism_is_excluded():
     c=replace(user_case(),V=0,restrained=True,support_edge_distance=1000)
     r=evaluate(c)
-    assert r.status=='ATENDE AO ESCOPO VERIFICADO'
-    assert evaluate(replace(c,support_edge_distance=0)).status=='VERIFICAÇÃO INCOMPLETA'
+    assert r.status=='ATENDE ÀS VERIFICAÇÕES REALIZADAS'
+    assert evaluate(replace(c,support_edge_distance=0)).status=='REVISAR CONDIÇÕES DE APLICAÇÃO'
     assert evaluate(replace(c,V=11000)).status=='ATENDE ÀS VERIFICAÇÕES REALIZADAS'
     assert any('N excêntrico' in i.text for i in evaluate(replace(c,plate_top=c.plate_top-10)).issues)
 
 
-def test_removed_full_depth_has_no_resistance_or_approval():
+def test_legacy_full_depth_keeps_base_calculation_and_explicit_assumption():
     c=replace(user_case(),plate_shape='between_flanges')
     r=evaluate(c)
-    assert r.status=='GEOMETRIA INVÁLIDA'
-    assert not r.checks and not r.actual
-    assert any('variante retirada' in i.text for i in r.issues)
+    assert r.checks==evaluate(user_case()).checks
+    assert r.actual==evaluate(user_case()).actual
+    assert any('sem ganho de resistência' in i.text for i in r.issues)
 
 
 def test_zero_weld_length_and_invalid_yieldline_are_rejected():
