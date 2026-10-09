@@ -57,7 +57,7 @@ As ações recebidas não são majoradas. Se a resultante for menor que 45 kN e 
 
 Isso inclui a função de contenção dos horizontais: resistência, rigidez e forças fora do plano, suas soldas e participação do par oposto. Os cálculos no plano sob H não resolvem esse mecanismo. Não se atribuem forças fictícias de estabilização por simples percentual de N, nem se apresenta uma rigidez auxiliar como comprovação da estabilidade global do nó.
 
-As verificações de componentes são úteis para revisão e desenvolvimento do detalhe, mas podem não governar o comportamento real da montagem. A aprovação da geometria não é validação do modelo de barras chatas, da rótula nominal ou da estabilidade do painel da nervura. Desde a versão 0.7, o resultado é **ATENDE ÀS VERIFICAÇÕES REALIZADAS** quando os componentes passam. As exclusões são registradas nas premissas finais; não recebem resistência implícita. Falhas de geometria e resistência têm prioridade.
+As verificações de componentes são úteis para revisão e desenvolvimento do detalhe, mas podem não governar o comportamento real da montagem. A aprovação da geometria não é validação do modelo de barras chatas, da rótula nominal ou da estabilidade do painel da nervura. O status é sempre **VERIFICAÇÃO INCOMPLETA** quando os componentes passam; falhas geométricas e resistentes têm prioridade sobre esse status.
 
 Também não entram: análise global dos membros, forças de outras vigas no mesmo nó, fadiga, atrito, vibração, ações cíclicas, incêndio e corrosão. Contenção eficaz da viga e juntas internas dos perfis soldados com penetração total são premissas fixas. Furos alongados, grupos assimétricos, mesas recortadas e posições excêntricas em altura exigem outra configuração.
 

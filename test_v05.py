@@ -68,7 +68,7 @@ def test_nbr_573_column_point_yield_result():
 def test_user_column_with_cjp_is_complete_within_explicit_assumptions():
     c=column_case();r=evaluate(c)
     assert (c.V,c.N,c.gap,c.a,c.plate_top)==(11000,2000,10,75,89.5)
-    assert r.status=='ATENDE ÀS VERIFICAÇÕES REALIZADAS'
+    assert r.status=='ATENDE AO ESCOPO VERIFICADO'
     assert r.governing.ratio==pytest.approx(.45393683714510796)
     assert {'support_joint_base','support_web_y','support_crippling'}<={x.id for x in r.checks}
     assert not any(x.id=='support_joint_weld' for x in r.checks)

@@ -47,8 +47,8 @@ def test_stock_source_is_not_silently_approved():
 def test_components_pass_without_full_node_approval(N):
     r=evaluate(replace(BASE,N=N))
     assert len(r.checks)==30 and all(x.passed for x in r.checks)
-    assert r.status=='ATENDE ÀS VERIFICAÇÕES REALIZADAS'
-    assert any(x.severity=='excluded' and x.text==ASSEMBLY_NOTE for x in r.issues)
+    assert r.status=='VERIFICAÇÃO INCOMPLETA'
+    assert any(x.severity=='pending' and x.text==ASSEMBLY_NOTE for x in r.issues)
     assert all(x.id!='dc_brace' for x in r.checks) # No invented stabilizer-force rule.
 
 def test_minimum_preserves_sign_and_does_not_change_input():
@@ -105,13 +105,11 @@ def test_net_splice_85_percent_limit_and_no_shim_strength_credit():
     ('bolt','ASTM A307','A325 ou A490'),('V',float('nan'),'finitas')])
 def test_geometry_and_unsupported_modes_stop_resistance(field,value,phrase):
     r=evaluate(replace(BASE,**{field:value}))
-    if field in ('extension','root_height','corner_clip'):
-        assert r.checks and any(x.severity=='interference' for x in r.issues)
-    else:assert r.status=='GEOMETRIA INVÁLIDA' and not r.checks
+    assert r.status=='GEOMETRIA INVÁLIDA' and not r.checks
     assert any(phrase in x.text for x in r.issues)
 
 def test_zero_and_overload_do_not_receive_approval():
-    r=evaluate(replace(BASE,N=0,V=0));assert not r.checks and r.status=='REVISAR CONDIÇÕES DE APLICAÇÃO'
+    r=evaluate(replace(BASE,N=0,V=0));assert not r.checks and r.status=='VERIFICAÇÃO INCOMPLETA'
     r=evaluate(replace(BASE,N=-1e6,V=1e6));assert r.status=='NÃO ATENDE'
     assert any(x.text==ASSEMBLY_NOTE for x in r.issues)
 
@@ -129,7 +127,7 @@ def test_report_has_real_equations_pending_and_correct_weld_path():
     xml=ZipFile(BytesIO(out)).read('word/document.xml')
     ns={'w':'http://schemas.openxmlformats.org/wordprocessingml/2006/main','m':'http://schemas.openxmlformats.org/officeDocument/2006/math'}
     root=etree.fromstring(xml);text=' '.join(root.xpath('//w:t/text()',namespaces=ns))
-    assert ASSEMBLY_NOTE in text and 'ATENDE ÀS VERIFICAÇÕES REALIZADAS' in text
+    assert ASSEMBLY_NOTE in text and 'VERIFICAÇÃO INCOMPLETA' in text
     assert 'as peças centradas' in text and 'As talas são independentes' in text
     assert len(root.xpath('//m:oMath',namespaces=ns))>=12
     assert 'Desenvolvido por LRO Soluções de engenharia LTDA.' in text

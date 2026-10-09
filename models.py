@@ -5,10 +5,8 @@ import json
 import math
 
 KGF = 9.80665
-VERSION = "0.7.1"
+VERSION = "0.6.0"
 SUPPORT_WEB_EXCLUSION = "Não é verificada a interação fora do plano da alma da viga de apoio sob N+V ou N excêntrico."
-COMPLEMENT_ASSUMPTION = "Complemento até as mesas da viga de apoio representado apenas no detalhamento. O cálculo mantém a single plate retangular de altura hₚ e sua solda à alma, sem ganho de resistência pelo complemento ou pelas soldas adicionais. Não são avaliadas a estabilidade do complemento nem a redistribuição de esforços por ele."
-INTERFERENCE_ASSUMPTION = "As interferências indicadas não impedem o cálculo das dimensões nominais informadas e devem ser resolvidas no detalhamento de fabricação. Alívios, recortes ou ajustes que alterem a seção resistente, os furos ou o comprimento útil de solda exigem atualizar os dados e recalcular."
 
 
 @dataclass(frozen=True)
@@ -132,8 +130,7 @@ class Connection:
             'supported_beam_weak_axis_moment_and_horizontal_shear': False,
             'welded_profile_internal_joint': 'complete_joint_penetration_matching_filler',
             'column_relative_flange_lateral_displacement': 'prevented_by_project_assumption',
-            'between_flanges_complement': 'detailing_only_no_strength_credit' if self.full_depth else 'not_used',
-            'opposite_stiffener': 'outside_scope',
+            'between_flanges_and_opposite_stiffener': 'outside_scope',
             'supporting_girder_web_combined_out_of_plane_interaction': 'not_verified',
         }
 
@@ -163,7 +160,7 @@ class Connection:
     def eccentric_n(self): return self.beam.d/2-self.yc
     @property
     def support_web_combined_excluded(self):
-        return self.kind=='beam_web' and self.N>0 and (self.V!=0 or abs(self.eccentric_n)>1e-8)
+        return self.kind=='beam_web' and not self.full_depth and self.N>0 and (self.V!=0 or abs(self.eccentric_n)>1e-8)
     @property
     def coped_top(self): return self.cope_top if self.cope in ("top","both") else 0.0
     @property
@@ -206,7 +203,7 @@ class Check:
 
     @property
     def category(self):
-        return "Condição do método" if self.id in ('support_punch','ductility','weld_development','full_compactness','opposite_compactness','ep_plate_rigidity','ep_column_rigidity','ep_plate_prying','ep_column_prying','ep_rotation','ep_ductility','ep_compact_flange','ep_compact_web') else "Resistência"
+        return "Condição do método" if self.id in ('support_punch','ductility','weld_development','full_compactness','opposite_compactness') else "Resistência"
 
     @property
     def ratio(self):
@@ -241,10 +238,9 @@ class Result:
     def status(self):
         if any(x.severity=="error" for x in self.issues):return "GEOMETRIA INVÁLIDA"
         if any(not c.passed for c in self.checks):return "NÃO ATENDE"
-        if any(x.severity=="pending" for x in self.issues):return "REVISAR CONDIÇÕES DE APLICAÇÃO"
-        if not self.checks:return "SEM VERIFICAÇÕES DE RESISTÊNCIA"
-        if any(x.severity=="interference" for x in self.issues):return "CÁLCULO ATENDE · CONFERIR INTERFERÊNCIAS"
-        return "ATENDE ÀS VERIFICAÇÕES REALIZADAS"
+        if any(x.severity=="pending" for x in self.issues):return "VERIFICAÇÃO INCOMPLETA"
+        if any(x.severity=="excluded" for x in self.issues):return "ATENDE ÀS VERIFICAÇÕES REALIZADAS"
+        return "ATENDE AO ESCOPO VERIFICADO"
 
     @property
     def governing(self):

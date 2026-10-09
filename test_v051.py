@@ -30,7 +30,7 @@ def test_exclusion_does_not_hide_failure_geometry_or_other_pending_gates():
     c=next(iter(presets().values()))
     assert evaluate(replace(c,V=300000)).status=='NÃO ATENDE'
     assert evaluate(replace(c,pitch=1)).status=='GEOMETRIA INVÁLIDA'
-    assert evaluate(replace(c,norm_minimum=False)).status=='REVISAR CONDIÇÕES DE APLICAÇÃO'
+    assert evaluate(replace(c,norm_minimum=False)).status=='VERIFICAÇÃO INCOMPLETA'
 
 
 def test_exclusion_scope_and_pure_centered_tension_model_remain_distinct():
@@ -38,7 +38,7 @@ def test_exclusion_scope_and_pure_centered_tension_model_remain_distinct():
     assert evaluate(replace(c,support_edge_distance=10000)).status=='ATENDE ÀS VERIFICAÇÕES REALIZADAS'
     pure=replace(c,V=0,support_edge_distance=1000)
     r=evaluate(pure)
-    assert r.status=='ATENDE ÀS VERIFICAÇÕES REALIZADAS'
+    assert r.status=='ATENDE AO ESCOPO VERIFICADO'
     assert {'support_web_n','support_web_punch_n'} <= {x.id for x in r.checks}
     assert not any(x.severity=='excluded' for x in r.issues)
     assert any(x.severity=='pending' and x.origin=='data' for x in evaluate(replace(pure,support_edge_distance=0)).issues)
@@ -48,4 +48,4 @@ def test_exclusion_scope_and_pure_centered_tension_model_remain_distinct():
     assert not replace(c,N=0).support_web_combined_excluded
     column=next(x for x in presets().values() if x.support.name=='CS 600 x 281')
     assert not column.support_web_combined_excluded
-    assert evaluate(column).status=='ATENDE ÀS VERIFICAÇÕES REALIZADAS'
+    assert evaluate(column).status=='ATENDE AO ESCOPO VERIFICADO'

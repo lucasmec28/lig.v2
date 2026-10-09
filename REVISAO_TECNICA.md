@@ -1,7 +1,5 @@
 # Revisão técnica — LRO Ligações 0.5.1
 
-> Registro técnico histórico. A versão 0.7.1 permite calcular com avisos de montagem e restaura o complemento entre mesas apenas no detalhamento, sem verificações extras nem crédito resistente. As referências ao bloqueio dessa opção descrevem o comportamento anterior. Consulte AJUSTES_V071.md.
-
 ## Resultado e escopo
 
 A versão foi consolidada para single plate retangular, com as premissas práticas solicitadas. **Não representa conclusão de 100% dos mecanismos possíveis das duas ligações.** A variante entre mesas está excluída; a interação da alma da viga de apoio sob tração e cortante é excluída do cálculo e identificada por uma nota simples, conforme solicitado.
